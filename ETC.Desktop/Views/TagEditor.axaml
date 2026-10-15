@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.TagEditor"
+             x:DataType="vm:TagListViewModel">
+  <StackPanel Spacing="8">
+    <ItemsControl ItemsSource="{Binding Items}" IsVisible="{Binding !!Items.Count}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="x:String">
+          <Border Classes="chip match" Padding="8,2,2,2">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <TextBlock Text="{Binding}" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" />
+              <Button Classes="icon" Padding="3" MinWidth="0" MinHeight="0"
+                      Command="{Binding $parent[ItemsControl].((vm:TagListViewModel)DataContext).RemoveCommand}"
+                      CommandParameter="{Binding}"
+                      ToolTip.Tip="Hapus"
+                      AutomationProperties.Name="{Binding StringFormat='Hapus {0}'}">
+                <c:Glyph Data="{StaticResource Icon.Close}" Size="14" />
+              </Button>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <TextBox Text="{Binding Input}" Watermark="Ketik keahlian lalu tekan Enter">
+      <TextBox.KeyBindings>
+        <KeyBinding Gesture="Enter" Command="{Binding AddCommand}" />
+      </TextBox.KeyBindings>
+    </TextBox>
+    <ItemsControl ItemsSource="{Binding Suggestions}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="x:String">
+          <Button Classes="plain" Padding="7,2" MinHeight="24" Margin="0,0,4,4" FontSize="12"
+                  Command="{Binding $parent[ItemsControl].((vm:TagListViewModel)DataContext).AddCommand}"
+                  CommandParameter="{Binding}"
+                  AutomationProperties.Name="{Binding StringFormat='Tambah {0}'}">
+            <StackPanel Orientation="Horizontal" Spacing="3">
+              <c:Glyph Data="{StaticResource Icon.Add}" Size="13" Foreground="{DynamicResource Accent}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding}" Foreground="{DynamicResource Accent}" FontSize="12" />
+            </StackPanel>
+          </Button>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:ETC.Desktop.Services"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.StatusLegend"
+             x:DataType="s:StatusCount">
+  <WrapPanel>
+    <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
+      <c:Glyph Data="{StaticResource Icon.CheckCircleFill}" Size="14" Foreground="{DynamicResource Success.Fg}" VerticalAlignment="Center" />
+      <TextBlock FontSize="12" Foreground="{DynamicResource Text.Secondary}" Text="{Binding Diterima, StringFormat='Diterima {0}'}" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
+      <c:Glyph Data="{StaticResource Icon.HourglassTopFill}" Size="14" Foreground="{DynamicResource Legend.Pending}" VerticalAlignment="Center" />
+      <TextBlock FontSize="12" Foreground="{DynamicResource Text.Secondary}" Text="{Binding Menunggu, StringFormat='Menunggu {0}'}" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="5">
+      <c:Glyph Data="{StaticResource Icon.CancelFill}" Size="14" Foreground="{DynamicResource Danger.Fg}" VerticalAlignment="Center" />
+      <TextBlock FontSize="12" Foreground="{DynamicResource Text.Secondary}" Text="{Binding Ditolak, StringFormat='Ditolak {0}'}" />
+    </StackPanel>
+  </WrapPanel>
+</UserControl>

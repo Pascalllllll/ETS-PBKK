@@ -1,0 +1,228 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:s="using:ETC.Desktop.Services"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.MyRekrutmenView"
+             x:DataType="vm:MyRekrutmenViewModel">
+  <Grid RowDefinitions="Auto,*" Margin="36,8,24,0">
+    <StackPanel Spacing="2" Margin="0,0,0,18">
+      <TextBlock Classes="h1" Text="Rekrutmen saya" />
+      <TextBlock Classes="secondary" Text="Pilih rekrutmen, tinjau pelamarnya, lalu terima atau tolak. Pelamar yang diterima langsung masuk tim." />
+    </StackPanel>
+
+    <ProgressBar Grid.Row="1" IsIndeterminate="True" VerticalAlignment="Top" Width="240" IsVisible="{Binding IsLoading}" />
+
+    <Border Grid.Row="1" Classes="error" VerticalAlignment="Top" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock Text="{Binding Error}" />
+    </Border>
+
+    <Border Grid.Row="1" Classes="card" IsVisible="{Binding IsEmpty}" VerticalAlignment="Top" HorizontalAlignment="Left" MaxWidth="520">
+      <StackPanel Spacing="10">
+        <c:Glyph Data="{StaticResource Icon.CampaignFill}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+        <TextBlock Classes="h3" Text="Anda belum membuka rekrutmen" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="Buka rekrutmen untuk mencari anggota lomba, asisten riset, atau rekan projek. Anda otomatis menjadi ketua timnya." />
+        <Button Classes="primary" Content="Buka rekrutmen" Command="{Binding NewCommand}" HorizontalAlignment="Left" />
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="300,16,300,16,*" IsVisible="{Binding !!Items.Count}">
+      <ListBox Classes="rows" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" Margin="0,0,0,16"
+               AutomationProperties.Name="Rekrutmen saya">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:RekrutmenRow">
+            <Border Padding="12,11">
+              <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="{Binding Role}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <Border Grid.Column="1" Classes="count" IsVisible="{Binding HasMenunggu}" Margin="8,0,0,0"
+                          ToolTip.Tip="Pelamar menunggu keputusan">
+                    <TextBlock Text="{Binding Menunggu}" />
+                  </Border>
+                </Grid>
+                <TextBlock Classes="caption" Text="{Binding Judul}" TextTrimming="CharacterEllipsis" />
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Classes="caption" Text="{Binding StatusText}" />
+                  <TextBlock Classes="caption" Text="·" />
+                  <TextBlock Classes="caption" Text="{Binding SlotText}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*" Margin="0,0,0,16">
+        <StackPanel Spacing="10" Margin="2,0,0,10">
+          <WrapPanel>
+            <Button Margin="0,0,8,8" Command="{Binding EditCommand}" Padding="8,5" ToolTip.Tip="Ubah rekrutmen">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <c:Glyph Data="{StaticResource Icon.EditFill}" Size="14" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                <TextBlock Text="Ubah" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Margin="0,0,8,8" Command="{Binding ToggleOpenCommand}" Padding="8,5">
+              <Panel>
+                <TextBlock Text="Tutup pendaftaran" IsVisible="{Binding Selected.IsOpen, FallbackValue=False}" />
+                <TextBlock Text="Buka kembali" IsVisible="{Binding !Selected.IsOpen, FallbackValue=False}" />
+              </Panel>
+            </Button>
+            <Button Margin="0,0,8,8" Classes="danger" Command="{Binding DeleteCommand}" Padding="8,5" ToolTip.Tip="Hapus rekrutmen"
+                    AutomationProperties.Name="Hapus rekrutmen">
+              <c:Glyph Data="{StaticResource Icon.DeleteFill}" Size="15" Foreground="{DynamicResource Danger.Fg}" />
+            </Button>
+          </WrapPanel>
+          <TextBlock Classes="group" Text="{Binding ApplicantsHeader}" />
+        </StackPanel>
+        <ProgressBar Grid.Row="1" IsIndeterminate="True" IsVisible="{Binding ApplicantsLoading}" />
+        <StackPanel Grid.Row="2" IsVisible="{Binding NoApplicants}" Spacing="6" Margin="4,12">
+          <TextBlock Classes="h3" Text="Belum ada pelamar" />
+          <TextBlock Classes="secondary" TextWrapping="Wrap"
+                     Text="Rekrutmen ini sudah tampil di Jelajahi. Bagikan ke grup angkatan atau himpunan supaya lebih banyak yang melihat." />
+        </StackPanel>
+        <ListBox Grid.Row="2" Classes="rows" ItemsSource="{Binding Applicants}" SelectedItem="{Binding SelectedApplicant}"
+                 AutomationProperties.Name="Pelamar">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:ApplicantRow">
+              <Grid ColumnDefinitions="Auto,*,Auto" Margin="10,9">
+                <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource Bg.Inset}">
+                  <TextBlock Text="{Binding Initials}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Grid.Column="1" Margin="10,0" Spacing="1">
+                  <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="caption" Text="{Binding MatchText}" />
+                </StackPanel>
+                <Panel Grid.Column="2" VerticalAlignment="Center">
+                  <c:Glyph Data="{StaticResource Icon.HourglassTopFill}" Size="15" Foreground="{DynamicResource Legend.Pending}" IsVisible="{Binding IsPending}" ToolTip.Tip="Menunggu" />
+                  <c:Glyph Data="{StaticResource Icon.CheckCircleFill}" Size="15" Foreground="{DynamicResource Success.Fg}" IsVisible="{Binding IsAccepted}" ToolTip.Tip="Diterima" />
+                  <c:Glyph Data="{StaticResource Icon.CancelFill}" Size="15" Foreground="{DynamicResource Danger.Fg}" IsVisible="{Binding IsRejected}" ToolTip.Tip="Ditolak" />
+                </Panel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+
+      <Border Grid.Column="4" Classes="card" Padding="0" Margin="0,0,0,16" IsVisible="{Binding HasApplicant}">
+        <ScrollViewer>
+          <StackPanel Margin="24,22" Spacing="20">
+            <Grid ColumnDefinitions="Auto,*">
+              <Border Width="52" Height="52" CornerRadius="26" Background="{DynamicResource Selection.Bg}">
+                <TextBlock Text="{Binding SelectedApplicant.Initials, FallbackValue={x:Null}}" FontSize="17" FontWeight="Bold"
+                           Foreground="{DynamicResource Selection.Fg}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Classes="h2" Text="{Binding SelectedApplicant.Nama, FallbackValue={x:Null}}" />
+                <TextBlock Classes="caption" Text="{Binding SelectedApplicant.Meta, FallbackValue={x:Null}}" />
+              </StackPanel>
+            </Grid>
+
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding SelectedApplicant.IsPending, FallbackValue=False}">
+                <Button Classes="success" Command="{Binding AcceptCommand}" MinHeight="34" Padding="14,6">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <c:Glyph Data="{StaticResource Icon.Check}" Size="16" Foreground="{DynamicResource Success.Fg}" VerticalAlignment="Center" />
+                    <TextBlock Text="Terima ke tim" Foreground="{DynamicResource Success.Fg}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="danger" Command="{Binding RejectCommand}" MinHeight="34" Padding="14,6" Content="Tolak" />
+              </StackPanel>
+              <Border Background="{DynamicResource Bg.Inset}" CornerRadius="8" Padding="12,9"
+                      IsVisible="{Binding !SelectedApplicant.IsPending, FallbackValue=False}">
+                <TextBlock Foreground="{DynamicResource Text.Secondary}"
+                           Text="{Binding SelectedApplicant.StatusText, StringFormat='Status: {0}. Keputusan sudah dikirim ke pelamar.', FallbackValue={x:Null}}" />
+              </Border>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Spacing="3" Margin="0,0,12,0">
+                <TextBlock Classes="group" Text="Reputasi di ETC" />
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <c:Glyph Data="{StaticResource Icon.StarFill}" Size="15" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding SelectedApplicant.Reputasi, FallbackValue={x:Null}}" FontWeight="SemiBold" />
+                </StackPanel>
+                <TextBlock Classes="caption" Text="{Binding SelectedApplicant.Pengalaman, FallbackValue={x:Null}}" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="3">
+                <TextBlock Classes="group" Text="Identitas" />
+                <TextBlock Text="{Binding SelectedApplicant.NoPengenal, FallbackValue={x:Null}}" FontWeight="SemiBold" />
+                <TextBlock Classes="caption" Text="{Binding SelectedApplicant.Kontak, FallbackValue={x:Null}}" />
+              </StackPanel>
+            </Grid>
+
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="Keahlian" />
+              <ItemsControl ItemsSource="{Binding SelectedApplicant.Chips, FallbackValue={x:Null}}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SkillChip">
+                    <Border Classes="chip" Classes.match="{Binding Match}" Padding="9,3">
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <c:Glyph Data="{StaticResource Icon.Check}" Size="13" IsVisible="{Binding Match}" Foreground="{DynamicResource Text.Primary}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Name}" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="caption" Text="{Binding SelectedApplicant.MatchText, FallbackValue={x:Null}, StringFormat='{}{0} dengan rekrutmen ini'}" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="Alasan mendaftar" />
+              <SelectableTextBlock Text="{Binding SelectedApplicant.Alasan, FallbackValue={x:Null}}" TextWrapping="Wrap" LineHeight="20" />
+            </StackPanel>
+
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Command="{Binding OpenLinkCommand}" CommandParameter="{Binding SelectedApplicant.Data.CvUrl, FallbackValue={x:Null}}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.Link}" Size="15" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Text="Buka CV" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Margin="0,0,8,8" Command="{Binding OpenLinkCommand}" CommandParameter="{Binding SelectedApplicant.Data.PortofolioUrl, FallbackValue={x:Null}}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.Link}" Size="15" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Text="Buka portofolio" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Margin="0,0,8,8" Command="{Binding OpenWhatsAppCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.CallFill}" Size="15" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Text="WhatsApp" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </WrapPanel>
+
+            <StackPanel Spacing="10" IsVisible="{Binding HasReviews}">
+              <TextBlock Classes="h3" Text="Ulasan terbaru dari rekan tim" />
+              <ItemsControl ItemsSource="{Binding Reviews}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="s:ReviewItem">
+                    <Border BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,1,0,0" Padding="0,10">
+                      <StackPanel Spacing="3">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Text="{Binding ReviewerNama}" FontWeight="SemiBold" FontSize="12" />
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3">
+                            <c:Glyph Data="{StaticResource Icon.StarFill}" Size="13" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Center" />
+                            <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding Rating}" />
+                          </StackPanel>
+                        </Grid>
+                        <TextBlock Classes="caption" Text="{Binding Kegiatan}" />
+                        <TextBlock Text="{Binding Deskripsi}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource Text.Secondary}" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

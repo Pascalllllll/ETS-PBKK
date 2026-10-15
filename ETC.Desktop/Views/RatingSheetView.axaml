@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.RatingSheetView"
+             x:DataType="vm:RatingSheetViewModel">
+  <UserControl.Styles>
+    <Style Selector="Button.star">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="MinWidth" Value="36" />
+      <Setter Property="MinHeight" Value="36" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Margin="28,26" Spacing="16">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="{Binding Title}" />
+      <TextBlock Classes="secondary" Text="{Binding Subtitle}" TextWrapping="Wrap" />
+    </StackPanel>
+    <StackPanel Spacing="6">
+      <TextBlock Classes="field" Text="Penilaian" />
+      <StackPanel Orientation="Horizontal" Spacing="2">
+        <Button Classes="star" Command="{Binding SetRatingCommand}" CommandParameter="1" AutomationProperties.Name="1 bintang">
+          <Panel><c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" IsVisible="{Binding Star1}" /><c:Glyph Data="{StaticResource Icon.Star}" Size="26" Foreground="{DynamicResource Text.Tertiary}" IsVisible="{Binding !Star1}" /></Panel>
+        </Button>
+        <Button Classes="star" Command="{Binding SetRatingCommand}" CommandParameter="2" AutomationProperties.Name="2 bintang">
+          <Panel><c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" IsVisible="{Binding Star2}" /><c:Glyph Data="{StaticResource Icon.Star}" Size="26" Foreground="{DynamicResource Text.Tertiary}" IsVisible="{Binding !Star2}" /></Panel>
+        </Button>
+        <Button Classes="star" Command="{Binding SetRatingCommand}" CommandParameter="3" AutomationProperties.Name="3 bintang">
+          <Panel><c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" IsVisible="{Binding Star3}" /><c:Glyph Data="{StaticResource Icon.Star}" Size="26" Foreground="{DynamicResource Text.Tertiary}" IsVisible="{Binding !Star3}" /></Panel>
+        </Button>
+        <Button Classes="star" Command="{Binding SetRatingCommand}" CommandParameter="4" AutomationProperties.Name="4 bintang">
+          <Panel><c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" IsVisible="{Binding Star4}" /><c:Glyph Data="{StaticResource Icon.Star}" Size="26" Foreground="{DynamicResource Text.Tertiary}" IsVisible="{Binding !Star4}" /></Panel>
+        </Button>
+        <Button Classes="star" Command="{Binding SetRatingCommand}" CommandParameter="5" AutomationProperties.Name="5 bintang">
+          <Panel><c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" IsVisible="{Binding Star5}" /><c:Glyph Data="{StaticResource Icon.Star}" Size="26" Foreground="{DynamicResource Text.Tertiary}" IsVisible="{Binding !Star5}" /></Panel>
+        </Button>
+      </StackPanel>
+      <TextBlock Classes="caption" Text="{Binding RatingLabel}" />
+    </StackPanel>
+    <StackPanel>
+      <TextBlock Classes="field" Text="Ulasan" />
+      <TextBox Text="{Binding Deskripsi}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxLength="400"
+               Watermark="Apa kontribusinya, dan apa yang bisa ditingkatkan?" />
+      <TextBlock Classes="hint" Text="Ulasan tampil di profil anggota dan membantu pembuat rekrutmen lain menilai calon tim." />
+    </StackPanel>
+    <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock Text="{Binding Error}" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Batal" Command="{Binding CancelCommand}" />
+      <Button Classes="primary" Content="Kirim ulasan" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

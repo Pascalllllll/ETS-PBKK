@@ -1,0 +1,114 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Palet dari logo ETC: navy untuk aksi utama di mode terang, emas di mode gelap. Warna chart lolos validator palet dataviz. -->
+  <FontFamily x:Key="Font.Ui">avares://ETC/Assets/Fonts#Hanken Grotesk</FontFamily>
+
+  <CornerRadius x:Key="Radius.Control">7</CornerRadius>
+  <CornerRadius x:Key="Radius.Card">12</CornerRadius>
+  <CornerRadius x:Key="Radius.Sheet">14</CornerRadius>
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="Bg.Window" Color="#F4F5F7" />
+      <SolidColorBrush x:Key="Bg.Sidebar" Color="#ECEEF2" />
+      <SolidColorBrush x:Key="Bg.Card" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Bg.Inset" Color="#E9ECF0" />
+      <SolidColorBrush x:Key="Bg.InsetHover" Color="#DFE3E9" />
+      <SolidColorBrush x:Key="Bg.Field" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Line.Hairline" Color="#E3E6EB" />
+      <SolidColorBrush x:Key="Line.Strong" Color="#C9CED7" />
+      <SolidColorBrush x:Key="Text.Primary" Color="#0F1A2E" />
+      <SolidColorBrush x:Key="Text.Secondary" Color="#4A5568" />
+      <SolidColorBrush x:Key="Text.Tertiary" Color="#5F6879" />
+      <SolidColorBrush x:Key="Primary.Bg" Color="#0E2039" />
+      <SolidColorBrush x:Key="Primary.BgHover" Color="#1D3457" />
+      <SolidColorBrush x:Key="Primary.Fg" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="Accent" Color="#2F5DA8" />
+      <SolidColorBrush x:Key="Selection.Bg" Color="#DCE3EF" />
+      <SolidColorBrush x:Key="Selection.Fg" Color="#0E2039" />
+      <SolidColorBrush x:Key="Marker.Bg" Color="#F5C531" />
+      <SolidColorBrush x:Key="Marker.Soft" Color="#FDF0C4" />
+      <SolidColorBrush x:Key="Marker.Fg" Color="#0E2039" />
+      <SolidColorBrush x:Key="Success.Fg" Color="#1F7A3D" />
+      <SolidColorBrush x:Key="Success.Bg" Color="#E6F2EA" />
+      <SolidColorBrush x:Key="Danger.Fg" Color="#C0362C" />
+      <SolidColorBrush x:Key="Danger.Bg" Color="#FBEAE8" />
+      <SolidColorBrush x:Key="Pending.Fg" Color="#4A5568" />
+      <SolidColorBrush x:Key="Pending.Bg" Color="#ECEEF3" />
+      <SolidColorBrush x:Key="Scrim" Color="#590E2039" />
+      <SolidColorBrush x:Key="Legend.Lomba" Color="#C9930A" />
+      <SolidColorBrush x:Key="Legend.Riset" Color="#1C9A86" />
+      <SolidColorBrush x:Key="Legend.Projek" Color="#2F5DA8" />
+      <SolidColorBrush x:Key="Legend.Pending" Color="#8B93A3" />
+      <Color x:Key="Chart.Lomba">#C9930A</Color>
+      <Color x:Key="Chart.Riset">#1C9A86</Color>
+      <Color x:Key="Chart.Projek">#2F5DA8</Color>
+      <Color x:Key="Chart.Grid">#E7E9EE</Color>
+      <Color x:Key="Chart.Text">#5F6879</Color>
+      <Color x:Key="Chart.TextStrong">#0F1A2E</Color>
+      <Color x:Key="Chart.Tooltip">#0E2039</Color>
+      <Color x:Key="Chart.TooltipText">#FFFFFF</Color>
+      <Color x:Key="Chart.Track">#E9ECF0</Color>
+      <Color x:Key="Chart.Success">#1F7A3D</Color>
+      <Color x:Key="Chart.Danger">#C0362C</Color>
+      <Color x:Key="Chart.Pending">#8B93A3</Color>
+      <BoxShadows x:Key="Shadow.Sheet">0 18 48 0 #330E2039</BoxShadows>
+      <BoxShadows x:Key="Shadow.Raised">0 1 2 0 #140E2039</BoxShadows>
+      <!-- Fluent memakai warna aksen sistem untuk toggle, checkbox, dan seleksi. -->
+      <Color x:Key="SystemAccentColor">#0E2039</Color>
+      <Color x:Key="SystemAccentColorDark1">#1D3457</Color>
+      <Color x:Key="SystemAccentColorLight1">#2F5DA8</Color>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="Bg.Window" Color="#14161B" />
+      <SolidColorBrush x:Key="Bg.Sidebar" Color="#1A1D23" />
+      <SolidColorBrush x:Key="Bg.Card" Color="#1E2128" />
+      <SolidColorBrush x:Key="Bg.Inset" Color="#2A2E36" />
+      <SolidColorBrush x:Key="Bg.InsetHover" Color="#30343E" />
+      <SolidColorBrush x:Key="Bg.Field" Color="#181B21" />
+      <SolidColorBrush x:Key="Line.Hairline" Color="#2C313A" />
+      <SolidColorBrush x:Key="Line.Strong" Color="#414856" />
+      <SolidColorBrush x:Key="Text.Primary" Color="#EEF1F6" />
+      <SolidColorBrush x:Key="Text.Secondary" Color="#B3BAC7" />
+      <SolidColorBrush x:Key="Text.Tertiary" Color="#98A0AE" />
+      <SolidColorBrush x:Key="Primary.Bg" Color="#F5C531" />
+      <SolidColorBrush x:Key="Primary.BgHover" Color="#F8D35E" />
+      <SolidColorBrush x:Key="Primary.Fg" Color="#0E2039" />
+      <SolidColorBrush x:Key="Accent" Color="#8FB0EA" />
+      <SolidColorBrush x:Key="Selection.Bg" Color="#2A3346" />
+      <SolidColorBrush x:Key="Selection.Fg" Color="#EEF1F6" />
+      <SolidColorBrush x:Key="Marker.Bg" Color="#F5C531" />
+      <SolidColorBrush x:Key="Marker.Soft" Color="#33301F" />
+      <SolidColorBrush x:Key="Marker.Fg" Color="#0E2039" />
+      <SolidColorBrush x:Key="Success.Fg" Color="#5BC27A" />
+      <SolidColorBrush x:Key="Success.Bg" Color="#1F3326" />
+      <SolidColorBrush x:Key="Danger.Fg" Color="#F07167" />
+      <SolidColorBrush x:Key="Danger.Bg" Color="#3A2224" />
+      <SolidColorBrush x:Key="Pending.Fg" Color="#B3BAC7" />
+      <SolidColorBrush x:Key="Pending.Bg" Color="#2A2E36" />
+      <SolidColorBrush x:Key="Scrim" Color="#99000000" />
+      <SolidColorBrush x:Key="Legend.Lomba" Color="#B8891A" />
+      <SolidColorBrush x:Key="Legend.Riset" Color="#21957F" />
+      <SolidColorBrush x:Key="Legend.Projek" Color="#4E7BC9" />
+      <SolidColorBrush x:Key="Legend.Pending" Color="#6E7686" />
+      <Color x:Key="Chart.Lomba">#B8891A</Color>
+      <Color x:Key="Chart.Riset">#21957F</Color>
+      <Color x:Key="Chart.Projek">#4E7BC9</Color>
+      <Color x:Key="Chart.Grid">#2A2F38</Color>
+      <Color x:Key="Chart.Text">#98A0AE</Color>
+      <Color x:Key="Chart.TextStrong">#EEF1F6</Color>
+      <Color x:Key="Chart.Tooltip">#EEF1F6</Color>
+      <Color x:Key="Chart.TooltipText">#0F1A2E</Color>
+      <Color x:Key="Chart.Track">#2A2E36</Color>
+      <Color x:Key="Chart.Success">#4FAE6C</Color>
+      <Color x:Key="Chart.Danger">#E0625A</Color>
+      <Color x:Key="Chart.Pending">#6E7686</Color>
+      <BoxShadows x:Key="Shadow.Sheet">0 18 48 0 #66000000</BoxShadows>
+      <BoxShadows x:Key="Shadow.Raised">0 1 2 0 #33000000</BoxShadows>
+      <Color x:Key="SystemAccentColor">#F5C531</Color>
+      <Color x:Key="SystemAccentColorDark1">#E6B800</Color>
+      <Color x:Key="SystemAccentColorLight1">#F8D35E</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

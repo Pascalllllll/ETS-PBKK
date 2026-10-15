@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.MyApplicationsView"
+             x:DataType="vm:MyApplicationsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="36,8,36,40" MaxWidth="900" HorizontalAlignment="Left" Spacing="18">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="h1" Text="Lamaran saya" />
+        <TextBlock Classes="secondary" Text="{Binding Summary}" />
+      </StackPanel>
+
+      <ProgressBar IsIndeterminate="True" Width="240" HorizontalAlignment="Left" IsVisible="{Binding IsLoading}" />
+      <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <TextBlock Text="{Binding Error}" />
+      </Border>
+
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <c:Glyph Data="{StaticResource Icon.SendFill}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+          <TextBlock Classes="h3" Text="Belum ada lamaran" />
+          <TextBlock Classes="secondary" TextWrapping="Wrap" Text="Lamaran yang Anda kirim muncul di sini bersama statusnya. Mulai dari rekrutmen yang cocok dengan keahlian Anda." />
+          <Button Classes="primary" Content="Jelajahi rekrutmen" Command="{Binding ExploreCommand}" HorizontalAlignment="Left" />
+        </StackPanel>
+      </Border>
+
+      <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ApplicationRow">
+            <Border Classes="card" Padding="18,16" Margin="0,0,0,10">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Width="34" Height="34" CornerRadius="17" VerticalAlignment="Top"
+                        Background="{DynamicResource Pending.Bg}">
+                  <Panel>
+                    <c:Glyph Data="{StaticResource Icon.HourglassTopFill}" Size="17" Foreground="{DynamicResource Pending.Fg}" IsVisible="{Binding IsPending}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <c:Glyph Data="{StaticResource Icon.CheckCircleFill}" Size="18" Foreground="{DynamicResource Success.Fg}" IsVisible="{Binding IsAccepted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <c:Glyph Data="{StaticResource Icon.CancelFill}" Size="18" Foreground="{DynamicResource Danger.Fg}" IsVisible="{Binding IsRejected}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Panel>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="14,0" Spacing="3">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Rekrutmen.Role}" FontWeight="SemiBold" FontSize="14" />
+                    <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Pending.Bg}" IsVisible="{Binding IsPending}">
+                      <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Pending.Fg}" />
+                    </Border>
+                    <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Success.Bg}" IsVisible="{Binding IsAccepted}">
+                      <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Success.Fg}" />
+                    </Border>
+                    <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Danger.Bg}" IsVisible="{Binding IsRejected}">
+                      <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Danger.Fg}" />
+                    </Border>
+                  </StackPanel>
+                  <TextBlock Classes="secondary" Text="{Binding Rekrutmen.Judul}" />
+                  <TextBlock Classes="caption" Text="{Binding Rekrutmen.Pembuat}" />
+                  <TextBlock Classes="caption" Text="{Binding Timeline}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                  <Button Classes="plain" Content="Lihat rekrutmen"
+                          Command="{Binding $parent[ItemsControl].((vm:MyApplicationsViewModel)DataContext).OpenCommand}" CommandParameter="{Binding}" />
+                  <Button Content="Batalkan" IsVisible="{Binding IsPending}"
+                          Command="{Binding $parent[ItemsControl].((vm:MyApplicationsViewModel)DataContext).WithdrawCommand}" CommandParameter="{Binding}" />
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

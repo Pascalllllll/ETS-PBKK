@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.ShellView"
+             x:DataType="vm:ShellViewModel"
+             Focusable="True">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Ctrl+D1" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Ringkasan}" />
+    <KeyBinding Gesture="Ctrl+D2" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Jelajahi}" />
+    <KeyBinding Gesture="Ctrl+D3" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Tersimpan}" />
+    <KeyBinding Gesture="Ctrl+D4" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.RekrutmenSaya}" />
+    <KeyBinding Gesture="Ctrl+D5" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.LamaranSaya}" />
+    <KeyBinding Gesture="Ctrl+D6" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.TimSaya}" />
+    <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Profil}" />
+    <KeyBinding Gesture="Ctrl+N" Command="{Binding NewRekrutmenCommand}" />
+    <KeyBinding Gesture="Ctrl+OemBackslash" Command="{Binding ToggleSidebarCommand}" />
+    <KeyBinding Gesture="Escape" Command="{Binding CloseSheetCommand}" />
+  </UserControl.KeyBindings>
+
+  <Grid>
+    <Grid ColumnDefinitions="Auto,*">
+      <Border Width="236" Background="{DynamicResource Bg.Sidebar}" IsVisible="{Binding SidebarVisible}"
+              BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,0,1,0">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <StackPanel Orientation="Horizontal" Spacing="9" Margin="18,18,12,14">
+            <Border Background="#FFFFFF" CornerRadius="7" Width="28" Height="28" Padding="3">
+              <Image Source="avares://ETC/Assets/etc-logo.png" />
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="ETC" FontWeight="ExtraBold" FontSize="14" />
+              <TextBlock Classes="caption" Text="Elite TC Champions" FontSize="11" />
+            </StackPanel>
+          </StackPanel>
+
+          <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="10,4" Spacing="1">
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+1"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Ringkasan}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.SpaceDashboardFill}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Ringkasan" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+
+              <TextBlock Classes="group" Text="Rekrutmen" Margin="10,16,0,6" />
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+2"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Jelajahi}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.TravelExplore}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Jelajahi" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+3"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Tersimpan}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.BookmarkFill}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Tersimpan" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+4"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=RekrutmenSaya}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <c:Glyph Data="{StaticResource Icon.CampaignFill}" Size="17" />
+                    <TextBlock Classes="navlabel" Text="Rekrutmen saya" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="count" IsVisible="{Binding HasPelamarMenunggu}"
+                          ToolTip.Tip="Pelamar menunggu keputusan"
+                          AutomationProperties.Name="{Binding PelamarMenunggu, StringFormat='{}{0} pelamar menunggu keputusan'}">
+                    <TextBlock Text="{Binding PelamarMenunggu}" />
+                  </Border>
+                </Grid>
+              </RadioButton>
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+5"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=LamaranSaya}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.SendFill}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Lamaran saya" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+
+              <TextBlock Classes="group" Text="Kolaborasi" Margin="10,16,0,6" />
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+6"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=TimSaya}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.GroupsFill}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Tim saya" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+,"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Profil}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <c:Glyph Data="{StaticResource Icon.PersonFill}" Size="17" />
+                  <TextBlock Classes="navlabel" Text="Profil dan ulasan" VerticalAlignment="Center" />
+                </StackPanel>
+              </RadioButton>
+            </StackPanel>
+          </ScrollViewer>
+
+          <Border Grid.Row="2" BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,1,0,0" Padding="14,12">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Border Width="30" Height="30" CornerRadius="15" Background="{DynamicResource Selection.Bg}">
+                <TextBlock Text="{Binding Initials}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource Selection.Fg}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <StackPanel Grid.Column="1" Margin="9,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                <TextBlock Classes="caption" Text="{Binding RoleText}" FontSize="11" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <Button Grid.Column="2" Classes="icon" Command="{Binding LogoutCommand}" ToolTip.Tip="Keluar"
+                      AutomationProperties.Name="Keluar">
+                <c:Glyph Data="{StaticResource Icon.Logout}" Size="17" />
+              </Button>
+            </Grid>
+          </Border>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Column="1" RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,10,20,0">
+          <Button Classes="icon" Command="{Binding ToggleSidebarCommand}" ToolTip.Tip="Tampilkan atau sembunyikan sidebar (Ctrl+\)"
+                  AutomationProperties.Name="Tampilkan atau sembunyikan sidebar">
+            <c:Glyph Data="{StaticResource Icon.LeftPanelClose}" Size="18" />
+          </Button>
+          <Button Grid.Column="2" Classes="primary" Command="{Binding NewRekrutmenCommand}" ToolTip.Tip="Ctrl+N">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:Glyph Data="{StaticResource Icon.Add}" Size="16" Foreground="{DynamicResource Primary.Fg}" VerticalAlignment="Center" />
+              <TextBlock Text="Buka rekrutmen" Foreground="{DynamicResource Primary.Fg}" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </Grid>
+        <ContentControl Grid.Row="1" Content="{Binding Content}" />
+      </Grid>
+    </Grid>
+
+    <Grid IsVisible="{Binding HasSheet}">
+      <Border Background="{DynamicResource Scrim}" PointerPressed="OnScrimPressed" />
+      <Border Background="{DynamicResource Bg.Card}" CornerRadius="{StaticResource Radius.Sheet}"
+              BoxShadow="{DynamicResource Shadow.Sheet}" Width="580" Margin="0,40"
+              VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="True">
+        <ContentControl Content="{Binding Sheet}" />
+      </Border>
+    </Grid>
+
+    <Border IsVisible="{Binding HasToast}" Background="{DynamicResource Primary.Bg}" CornerRadius="10"
+            Padding="16,10" Margin="0,0,0,24" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+            BoxShadow="{DynamicResource Shadow.Sheet}">
+      <TextBlock Text="{Binding Toast}" Foreground="{DynamicResource Primary.Fg}" FontWeight="SemiBold" />
+    </Border>
+  </Grid>
+</UserControl>

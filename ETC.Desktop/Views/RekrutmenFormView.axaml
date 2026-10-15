@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             x:Class="ETC.Desktop.Views.RekrutmenFormView"
+             x:DataType="vm:RekrutmenFormViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" MaxHeight="760">
+    <StackPanel Margin="28,24,28,12" Spacing="3">
+      <TextBlock Classes="h2" Text="{Binding Title}" />
+      <TextBlock Classes="secondary" Text="Anda otomatis menjadi ketua tim. Pelamar yang Anda terima langsung masuk tim." TextWrapping="Wrap" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="1">
+      <StackPanel Margin="28,6,28,12" Spacing="16">
+        <StackPanel>
+          <TextBlock Classes="field" Text="Jenis kegiatan" />
+          <Border Classes="segmented" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+              <RadioButton Classes="segment" GroupName="formKegiatan" Content="Lomba" IsChecked="{Binding IsLomba}" />
+              <RadioButton Classes="segment" GroupName="formKegiatan" Content="Riset" IsChecked="{Binding IsRiset}" />
+              <RadioButton Classes="segment" GroupName="formKegiatan" Content="Projek" IsChecked="{Binding IsProjek}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Nama kegiatan" />
+          <TextBox Text="{Binding Judul}" Watermark="Nama lomba, judul riset, atau nama projek" />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Posisi yang dicari" />
+          <TextBox Text="{Binding Role}" Watermark="Contoh: UI/UX Designer" />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Deskripsi" />
+          <TextBox Text="{Binding Deskripsi}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72"
+                   Watermark="Apa yang akan dikerjakan tim, dan bagaimana ritme kerjanya" />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Kriteria pendaftar" />
+          <TextBox Text="{Binding Kriteria}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="56" />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Keahlian yang dicari" />
+          <v:TagEditor DataContext="{Binding Skills}" />
+        </StackPanel>
+        <Grid ColumnDefinitions="*,16,*">
+          <StackPanel>
+            <TextBlock Classes="field" Text="Kuota anggota" />
+            <NumericUpDown Value="{Binding Kuota}" Minimum="1" Maximum="20" Increment="1" FormatString="0" />
+          </StackPanel>
+          <StackPanel Grid.Column="2">
+            <TextBlock Classes="field" Text="Fee (Rp, kosongkan jika tidak ada)" />
+            <TextBox Text="{Binding Fee}" />
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="*,12,*,12,*">
+          <StackPanel>
+            <TextBlock Classes="field" Text="Batas pendaftaran" />
+            <CalendarDatePicker SelectedDate="{Binding Batas}" />
+          </StackPanel>
+          <StackPanel Grid.Column="2">
+            <TextBlock Classes="field" Text="Mulai" />
+            <CalendarDatePicker SelectedDate="{Binding Mulai}" />
+          </StackPanel>
+          <StackPanel Grid.Column="4">
+            <TextBlock Classes="field" Text="Selesai" />
+            <CalendarDatePicker SelectedDate="{Binding Selesai}" />
+          </StackPanel>
+        </Grid>
+        <StackPanel>
+          <TextBlock Classes="field" Text="Kontak" />
+          <TextBox Text="{Binding Contact}" />
+          <TextBlock Classes="hint" Text="Diisi otomatis dari nomor WhatsApp di profil Anda." />
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Border Grid.Row="2" BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,1,0,0" Padding="28,14">
+      <StackPanel Spacing="10">
+        <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <TextBlock Text="{Binding Error}" />
+        </Border>
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Batal" Command="{Binding CancelCommand}" />
+          <Button Classes="primary" Content="{Binding SubmitLabel}" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.RekrutmenDetailView"
+             x:DataType="vm:RekrutmenDetailViewModel">
+  <Border Classes="card" Padding="0">
+    <Grid>
+      <ProgressBar IsIndeterminate="True" VerticalAlignment="Top" Margin="28" IsVisible="{Binding IsLoading}" />
+      <TextBlock Classes="secondary" Margin="28" Text="Rekrutmen ini sudah dihapus oleh pembuatnya."
+                 IsVisible="{Binding NotFound}" />
+      <ScrollViewer IsVisible="{Binding Detail, Converter={x:Static ObjectConverters.IsNotNull}}" Background="{DynamicResource Bg.Card}">
+        <StackPanel Margin="28,24,28,28" Spacing="22">
+          <StackPanel Spacing="6">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:Glyph Data="{Binding Row.KegiatanIcon, Converter={x:Static v:IconConverter.Instance}, FallbackValue={x:Null}}" Size="15"
+                       Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+              <TextBlock Classes="caption" Text="{Binding Row.KegiatanLabel}" />
+              <TextBlock Classes="caption" Text="·" />
+              <TextBlock Classes="caption" Text="{Binding Row.StatusText}" />
+            </StackPanel>
+            <TextBlock Classes="h1" Text="{Binding Row.Role}" TextWrapping="Wrap" />
+            <TextBlock Classes="secondary" FontSize="15" Text="{Binding Row.Judul}" TextWrapping="Wrap" />
+          </StackPanel>
+
+          <StackPanel Spacing="10">
+            <WrapPanel>
+              <Button Margin="0,0,8,8" Classes="primary" Command="{Binding ApplyCommand}" IsVisible="{Binding CanApply}" MinHeight="34" Padding="16,6">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.SendFill}" Size="15" Foreground="{DynamicResource Primary.Fg}" VerticalAlignment="Center" />
+                  <TextBlock Text="Lamar posisi ini" Foreground="{DynamicResource Primary.Fg}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Margin="0,0,8,8" Command="{Binding ManageCommand}" IsVisible="{Binding Detail.IsMine, FallbackValue=False}" MinHeight="34" Content="Kelola pelamar" />
+              <Button Margin="0,0,8,8" Command="{Binding ToggleBookmarkCommand}" MinHeight="34"
+                      AutomationProperties.Name="Simpan atau hapus dari tersimpan">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Panel>
+                    <c:Glyph Data="{StaticResource Icon.BookmarkFill}" Size="16" Foreground="{DynamicResource Accent}" IsVisible="{Binding IsBookmarked}" VerticalAlignment="Center" />
+                    <c:Glyph Data="{StaticResource Icon.Bookmark}" Size="16" Foreground="{DynamicResource Text.Secondary}" IsVisible="{Binding !IsBookmarked}" VerticalAlignment="Center" />
+                  </Panel>
+                  <TextBlock Text="Tersimpan" IsVisible="{Binding IsBookmarked}" VerticalAlignment="Center" />
+                  <TextBlock Text="Simpan" IsVisible="{Binding !IsBookmarked}" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+              <Button Margin="0,0,8,8" Command="{Binding OpenContactCommand}" MinHeight="34" ToolTip.Tip="{Binding Detail.ContactPerson, FallbackValue={x:Null}}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.CallFill}" Size="15" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Text="Hubungi pembuat" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </WrapPanel>
+            <Border Background="{DynamicResource Bg.Inset}" CornerRadius="8" Padding="12,9" IsVisible="{Binding HasApplyState}">
+              <TextBlock Text="{Binding ApplyState}" TextWrapping="Wrap" Foreground="{DynamicResource Text.Secondary}" />
+            </Border>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+            <StackPanel Spacing="3" Margin="0,0,16,16">
+              <TextBlock Classes="group" Text="Batas pendaftaran" />
+              <TextBlock Text="{Binding Batas}" FontWeight="SemiBold" />
+              <TextBlock Classes="caption" Text="{Binding BatasRelatif}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="3" Margin="0,0,0,16">
+              <TextBlock Classes="group" Text="Periode kegiatan" />
+              <TextBlock Text="{Binding Periode}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Spacing="5" Margin="0,0,16,0">
+              <TextBlock Classes="group" Text="Kuota anggota" />
+              <TextBlock Text="{Binding Row.SlotText}" FontWeight="SemiBold" />
+              <ProgressBar Value="{Binding Row.SlotProgress}" Maximum="100" MaxWidth="200" HorizontalAlignment="Left" Width="200" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="3">
+              <TextBlock Classes="group" Text="Fee" />
+              <TextBlock Text="{Binding Row.FeeText}" FontWeight="SemiBold" />
+              <TextBlock Classes="caption" Text="{Binding Row.PendaftarText}" />
+            </StackPanel>
+          </Grid>
+
+          <Border Classes="hairline" />
+
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Tentang kegiatan" />
+            <SelectableTextBlock Text="{Binding Detail.Deskripsi, FallbackValue={x:Null}}" TextWrapping="Wrap" LineHeight="20" />
+          </StackPanel>
+
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Kriteria pendaftar" />
+            <SelectableTextBlock Text="{Binding Detail.Kriteria, FallbackValue={x:Null}}" TextWrapping="Wrap" LineHeight="20" />
+          </StackPanel>
+
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Keahlian yang dicari" />
+            <ItemsControl ItemsSource="{Binding Skills}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:SkillChip">
+                  <Border Classes="chip" Classes.match="{Binding Match}" Padding="9,3">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <c:Glyph Data="{StaticResource Icon.Check}" Size="13" IsVisible="{Binding Match}" Foreground="{DynamicResource Text.Primary}" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="caption" Text="{Binding MatchText}" />
+          </StackPanel>
+
+          <Border Background="{DynamicResource Bg.Window}" CornerRadius="10" Padding="16,14">
+            <Grid ColumnDefinitions="Auto,*">
+              <c:Glyph Data="{StaticResource Icon.SchoolFill}" Size="22" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Top" />
+              <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2">
+                <TextBlock Text="{Binding Row.Pembuat}" FontWeight="SemiBold" />
+                <TextBlock Classes="caption" Text="{Binding Detail.PembuatJurusan, FallbackValue={x:Null}}" />
+                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
+                  <c:Glyph Data="{StaticResource Icon.StarFill}" Size="14" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Center" />
+                  <TextBlock FontSize="12" Text="{Binding PembuatRating}" Foreground="{DynamicResource Text.Secondary}" />
+                </StackPanel>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Border>
+</UserControl>

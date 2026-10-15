@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:s="using:ETC.Desktop.Services"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.ProfileView"
+             x:DataType="vm:ProfileViewModel">
+  <ScrollViewer>
+    <Grid ColumnDefinitions="3*,24,2*" Margin="36,8,36,40" MaxWidth="1100" HorizontalAlignment="Left">
+      <StackPanel Spacing="18">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource Selection.Bg}">
+            <TextBlock Text="{Binding Initials}" FontSize="22" FontWeight="ExtraBold" Foreground="{DynamicResource Selection.Fg}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="2">
+            <TextBlock Classes="h1" Text="{Binding Nama}" />
+            <TextBlock Classes="secondary" Text="{Binding Identitas}" />
+            <TextBlock Classes="caption" Text="{Binding Bergabung}" />
+          </StackPanel>
+        </Grid>
+
+        <Border Classes="card">
+          <StackPanel Spacing="16">
+            <TextBlock Classes="h2" Text="Data diri" />
+            <StackPanel>
+              <TextBlock Classes="field" Text="Nama lengkap" />
+              <TextBox Text="{Binding Nama}" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,16,*">
+              <StackPanel>
+                <TextBlock Classes="field" Text="Departemen" />
+                <ComboBox ItemsSource="{Binding JurusanOptions}" SelectedItem="{Binding Jurusan}" PlaceholderText="Pilih departemen" />
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Classes="field" Text="Nomor WhatsApp" />
+                <TextBox Text="{Binding NoTelp}" />
+              </StackPanel>
+            </Grid>
+            <StackPanel>
+              <TextBlock Classes="field" Text="Tentang saya" />
+              <TextBox Text="{Binding Bio}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxLength="300"
+                       Watermark="Pengalaman lomba, riset, atau projek yang relevan" />
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Classes="field" Text="Keahlian" />
+              <v:TagEditor DataContext="{Binding Skills}" />
+              <TextBlock Classes="hint" Text="Dipakai untuk rekomendasi di Ringkasan dan ditampilkan ke pembuat rekrutmen." />
+            </StackPanel>
+            <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <TextBlock Text="{Binding Error}" />
+            </Border>
+            <Button Classes="primary" Content="Simpan profil" Command="{Binding SaveCommand}" IsEnabled="{Binding !IsBusy}" HorizontalAlignment="Left" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="14">
+            <TextBlock Classes="h2" Text="Tampilan" />
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel>
+                <TextBlock Text="Mode warna" FontWeight="SemiBold" />
+                <TextBlock Classes="caption" Text="Ikuti sistem menyesuaikan dengan pengaturan terang atau gelap di komputer Anda." TextWrapping="Wrap" />
+              </StackPanel>
+              <ComboBox Grid.Column="1" ItemsSource="{Binding AppearanceOptions}" SelectedItem="{Binding Appearance}" Width="160"
+                        VerticalAlignment="Center" AutomationProperties.Name="Mode warna" />
+            </Grid>
+            <Border Classes="hairline" />
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel>
+                <TextBlock Text="Keluar dari akun" FontWeight="SemiBold" />
+                <TextBlock Classes="caption" Text="Data tetap tersimpan di komputer ini." />
+              </StackPanel>
+              <Button Grid.Column="1" Content="Keluar" Command="{Binding LogoutCommand}" VerticalAlignment="Center" />
+            </Grid>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2" Spacing="14" Margin="0,84,0,0">
+        <Border Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Classes="group" Text="Rating dari rekan tim" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:Glyph Data="{StaticResource Icon.StarFill}" Size="26" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Center" />
+              <TextBlock Classes="display" Text="{Binding RatingText}" />
+            </StackPanel>
+            <TextBlock Classes="caption" Text="{Binding RatingCaption}" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+        <ItemsControl ItemsSource="{Binding Reviews}" IsVisible="{Binding HasReviews}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="s:ReviewItem">
+              <Border Classes="card" Padding="16,14" Margin="0,0,0,10">
+                <StackPanel Spacing="4">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding ReviewerNama}" FontWeight="SemiBold" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3">
+                      <c:Glyph Data="{StaticResource Icon.StarFill}" Size="14" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Center" />
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Rating}" />
+                    </StackPanel>
+                  </Grid>
+                  <TextBlock Classes="caption" Text="{Binding Kegiatan}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Deskripsi}" TextWrapping="Wrap" Foreground="{DynamicResource Text.Secondary}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

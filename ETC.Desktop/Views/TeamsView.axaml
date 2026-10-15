@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.TeamsView"
+             x:DataType="vm:TeamsViewModel">
+  <Grid RowDefinitions="Auto,*" Margin="36,8,24,0">
+    <StackPanel Spacing="2" Margin="0,0,0,18">
+      <TextBlock Classes="h1" Text="Tim saya" />
+      <TextBlock Classes="secondary" Text="Tim terbentuk dari pelamar yang diterima. Setelah kegiatan selesai, beri ulasan untuk rekan tim." />
+    </StackPanel>
+
+    <ProgressBar Grid.Row="1" IsIndeterminate="True" Width="240" HorizontalAlignment="Left" VerticalAlignment="Top" IsVisible="{Binding IsLoading}" />
+    <Border Grid.Row="1" Classes="error" VerticalAlignment="Top" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock Text="{Binding Error}" />
+    </Border>
+    <Border Grid.Row="1" Classes="card" IsVisible="{Binding IsEmpty}" VerticalAlignment="Top" HorizontalAlignment="Left" MaxWidth="520">
+      <StackPanel Spacing="10">
+        <c:Glyph Data="{StaticResource Icon.GroupsFill}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+        <TextBlock Classes="h3" Text="Anda belum tergabung di tim" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="Tim muncul di sini saat lamaran Anda diterima, atau saat Anda menerima pelamar di rekrutmen sendiri." />
+        <Button Classes="primary" Content="Jelajahi rekrutmen" Command="{Binding ExploreCommand}" HorizontalAlignment="Left" />
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="320,20,*" IsVisible="{Binding !!Items.Count}">
+      <ListBox Classes="rows" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" Margin="0,0,0,16"
+               AutomationProperties.Name="Tim">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:TeamRow">
+            <Border Padding="12,11">
+              <StackPanel Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{Binding KegiatanIcon, Converter={x:Static v:IconConverter.Instance}}" Size="14"
+                           Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Classes="caption" Text="{Binding KegiatanLabel}" />
+                  <TextBlock Classes="caption" Text="·" />
+                  <TextBlock Classes="caption" Text="{Binding StatusText}" />
+                </StackPanel>
+                <TextBlock Text="{Binding Judul}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <TextBlock Classes="caption" Text="{Binding Peran}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Border Grid.Column="2" Classes="card" Padding="0" Margin="0,0,0,16" IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <ScrollViewer>
+          <StackPanel Margin="24,22" Spacing="18">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="h2" Text="{Binding Selected.Judul, FallbackValue={x:Null}}" TextWrapping="Wrap" />
+              <TextBlock Classes="secondary" Text="{Binding Selected.Periode, FallbackValue={x:Null}}" />
+              <TextBlock Classes="caption" Text="{Binding Selected.MemberCount, FallbackValue={x:Null}}" />
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding Selected.Members, FallbackValue={x:Null}}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:MemberRow">
+                  <Border BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,1,0,0" Padding="0,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource Selection.Bg}" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding Initials}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource Selection.Fg}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Border>
+                      <StackPanel Grid.Column="1" Margin="12,0" Spacing="3">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" />
+                          <TextBlock Classes="caption" Text="{Binding Peran}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="{Binding Meta}" />
+                        <ItemsControl ItemsSource="{Binding Skills}" Margin="0,4,0,0">
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                              <Border Classes="chip"><TextBlock Text="{Binding}" /></Border>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Spacing="6" HorizontalAlignment="Right">
+                        <Button Classes="primary" IsVisible="{Binding CanRate}"
+                                Command="{Binding $parent[ItemsControl].((vm:TeamsViewModel)DataContext).RateCommand}" CommandParameter="{Binding}">
+                          <StackPanel Orientation="Horizontal" Spacing="5">
+                            <c:Glyph Data="{StaticResource Icon.StarFill}" Size="14" Foreground="{DynamicResource Primary.Fg}" VerticalAlignment="Center" />
+                            <TextBlock Text="Beri ulasan" Foreground="{DynamicResource Primary.Fg}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                          </StackPanel>
+                        </Button>
+                        <TextBlock Classes="caption" Text="{Binding RatedText}" IsVisible="{Binding Rated}" HorizontalAlignment="Right" />
+                        <TextBlock Classes="caption" Text="Ulasan dibuka setelah kegiatan selesai" IsVisible="{Binding WaitingForEnd}"
+                                   HorizontalAlignment="Right" TextWrapping="Wrap" MaxWidth="160" TextAlignment="Right" />
+                        <Button Classes="plain" Content="WhatsApp" HorizontalAlignment="Right" IsVisible="{Binding !Data.IsMe}"
+                                Command="{Binding $parent[ItemsControl].((vm:TeamsViewModel)DataContext).ContactCommand}" CommandParameter="{Binding}" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

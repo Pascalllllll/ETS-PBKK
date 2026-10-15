@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:v="using:ETC.Desktop.Views"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.ExploreView"
+             x:DataType="vm:ExploreViewModel">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="36,8,24,0">
+    <StackPanel Spacing="2">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="secondary" Text="{Binding Subtitle}" />
+    </StackPanel>
+
+    <WrapPanel Grid.Row="1" Margin="0,16,0,14">
+      <Panel Margin="0,0,8,8" Width="300">
+        <TextBox x:Name="SearchBox" Classes="search" Text="{Binding SearchText}"
+                 Watermark="Cari posisi, kegiatan, keahlian, atau nama" AutomationProperties.Name="Cari rekrutmen" />
+        <c:Glyph Data="{StaticResource Icon.Search}" Size="16" Foreground="{DynamicResource Text.Tertiary}"
+                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False" />
+      </Panel>
+      <Border Margin="0,0,8,8" Classes="segmented">
+        <StackPanel Orientation="Horizontal">
+          <RadioButton Classes="segment" GroupName="kegiatan" Content="Semua" IsChecked="{Binding FilterAll}" />
+          <RadioButton Classes="segment" GroupName="kegiatan" Content="Lomba" IsChecked="{Binding FilterLomba}" />
+          <RadioButton Classes="segment" GroupName="kegiatan" Content="Riset" IsChecked="{Binding FilterRiset}" />
+          <RadioButton Classes="segment" GroupName="kegiatan" Content="Projek" IsChecked="{Binding FilterProjek}" />
+        </StackPanel>
+      </Border>
+      <ComboBox Margin="0,0,8,8" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding Sort}" Width="190" IsVisible="{Binding IsExplore}"
+                AutomationProperties.Name="Urutkan" />
+      <CheckBox Margin="0,0,8,8" Content="Hanya yang masih dibuka" IsChecked="{Binding OnlyOpen}" IsVisible="{Binding IsExplore}" VerticalAlignment="Center" />
+    </WrapPanel>
+
+    <Grid Grid.Row="2" ColumnDefinitions="380,20,*">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <TextBlock Classes="caption" Text="{Binding CountText}" Margin="4,0,0,8" />
+        <ProgressBar Grid.Row="1" IsIndeterminate="True" VerticalAlignment="Top" IsVisible="{Binding IsLoading}" Margin="4,0" />
+
+        <Border Grid.Row="1" Classes="error" VerticalAlignment="Top" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{Binding Error}" />
+            <Button Content="Coba lagi" Command="{Binding ReloadCommand}" />
+          </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1" IsVisible="{Binding IsEmpty}" Spacing="10" Margin="4,24" VerticalAlignment="Top">
+          <c:Glyph Data="{StaticResource Icon.Search}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+          <TextBlock Classes="h3" Text="{Binding EmptyTitle}" />
+          <TextBlock Classes="secondary" Text="{Binding EmptyBody}" TextWrapping="Wrap" />
+          <Button Content="Hapus semua filter" Command="{Binding ClearFiltersCommand}" IsVisible="{Binding IsExplore}" HorizontalAlignment="Left" />
+          <Button Content="Jelajahi rekrutmen" Command="{Binding GoExploreCommand}" IsVisible="{Binding IsBookmarks}" HorizontalAlignment="Left" />
+        </StackPanel>
+
+        <ListBox Grid.Row="1" Classes="rows" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}" IsVisible="{Binding !IsEmpty}"
+                 AutomationProperties.Name="Daftar rekrutmen">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:RekrutmenRow">
+              <Border Padding="14,12" BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,0,0,1">
+                <StackPanel Spacing="5">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <c:Glyph Data="{Binding KegiatanIcon, Converter={x:Static v:IconConverter.Instance}}" Size="14"
+                               Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                      <TextBlock Classes="caption" Text="{Binding KegiatanLabel}" />
+                      <TextBlock Classes="caption" Text="·" />
+                      <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding DeadlineText}" Foreground="{DynamicResource Danger.Fg}" IsVisible="{Binding Urgent}" />
+                      <TextBlock Classes="caption" Text="{Binding DeadlineText}" IsVisible="{Binding !Urgent}" />
+                    </StackPanel>
+                    <c:Glyph Grid.Column="1" Data="{StaticResource Icon.BookmarkFill}" Size="15" Foreground="{DynamicResource Accent}"
+                             IsVisible="{Binding IsBookmarked}" ToolTip.Tip="Tersimpan" />
+                  </Grid>
+                  <TextBlock Text="{Binding Role}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="secondary" FontSize="12" Text="{Binding Judul}" TextTrimming="CharacterEllipsis" />
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <TextBlock Classes="caption" Text="{Binding PembuatNama}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="1" Classes="caption" Text="{Binding SlotText}" Margin="8,0,0,0" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,16" IsVisible="{Binding HasPaging}">
+          <Button Classes="icon" Command="{Binding PrevPageCommand}" ToolTip.Tip="Halaman sebelumnya" AutomationProperties.Name="Halaman sebelumnya">
+            <c:Glyph Data="{StaticResource Icon.ChevronLeft}" Size="18" />
+          </Button>
+          <TextBlock Grid.Column="1" Classes="caption" Text="{Binding PageText}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Classes="icon" Command="{Binding NextPageCommand}" ToolTip.Tip="Halaman berikutnya" AutomationProperties.Name="Halaman berikutnya">
+            <c:Glyph Data="{StaticResource Icon.ChevronRight}" Size="18" />
+          </Button>
+        </Grid>
+      </Grid>
+
+      <ContentControl Grid.Column="2" Content="{Binding Detail}" Margin="0,0,0,16" />
+      <StackPanel Grid.Column="2" IsVisible="{Binding Detail, Converter={x:Static ObjectConverters.IsNull}}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+        <TextBlock Classes="secondary" Text="Pilih rekrutmen untuk melihat detail." HorizontalAlignment="Center"
+                   IsVisible="{Binding !IsEmpty}" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>
