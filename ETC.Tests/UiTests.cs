@@ -119,6 +119,7 @@ public class UiTests
             ("Rekrutmen saya", typeof(MyRekrutmenViewModel), "Pilih rekrutmen, tinjau"),
             ("Lamaran saya", typeof(MyApplicationsViewModel), "menunggu ·"),
             ("Tim saya", typeof(TeamsViewModel), "Tim terbentuk dari pelamar"),
+            ("Mentor", typeof(MentorViewModel), "Pengalaman dan prestasi"),
             ("Profil dan ulasan", typeof(ProfileViewModel), "Data diri"),
             ("Ringkasan", typeof(DashboardViewModel), "Perlu keputusan Anda"),
         };
@@ -316,8 +317,38 @@ public class UiTests
         await Until(() => Has(w, "Nomor WhatsApp diawali 08 atau 62"), "validasi nomor");
         profile.NoTelp = "081234560001";
         Click(w, Find<Button>(w, "Simpan profil"));
-        await Until(() => Shell.Toast == "Profil disimpan.", "profil tersimpan");
+        await Until(() => Shell.Toast?.StartsWith("Profil disimpan.") == true, "profil tersimpan");
         Click(w, Find<Button>(w, "Keluar"));
         await Until(() => App.Services.GetRequiredService<MainViewModel>().Current is AuthViewModel && Has(w, "Masuk ke ETC"), "kembali ke layar masuk");
+    }
+
+    [AvaloniaFact]
+    public async Task Ringkasan_menampilkan_langkah_onboarding_profil()
+    {
+        var w = await LoginDemo();
+        await Until(() => Has(w, "Lengkapi profil Anda") && Has(w, "Tulis pengalaman atau prestasi"), "kartu onboarding");
+        Click(w, Find<Button>(w, "Lengkapi profil"));
+        await Until(() => Shell.Content is ProfileViewModel && Has(w, "Pengalaman dan tautan"), "halaman profil");
+    }
+
+    [AvaloniaFact]
+    public async Task Butuh_mentor_membuka_form_dan_mengirim_permintaan()
+    {
+        var w = await LoginDemo();
+        Shell.Navigate(Page.Mentor);
+        await Until(() => Has(w, "Pengalaman dan prestasi"), "daftar mentor");
+        Click(w, Find<Button>(w, "Butuh mentor?"));
+        await Until(() => Shell.Sheet is MentorRequestSheetViewModel s && s.Mentors.Count > 0, "form mentor");
+        var sheet = (MentorRequestSheetViewModel)Shell.Sheet!;
+
+        Click(w, Find<Button>(w, "Kirim permintaan"));
+        await Until(() => Has(w, "Pilih mentor yang ingin dihubungi."), "validasi mentor");
+
+        sheet.Mentor = sheet.Mentors.First(m => m.Nama.StartsWith("Cathleen"));
+        sheet.Topik = "Analisis data Satria Data";
+        sheet.Pesan = "Tim kami butuh arahan memilih metode regresi untuk babak final.";
+        Click(w, Find<Button>(w, "Kirim permintaan"));
+        await Until(() => Shell.Sheet is null && ((MentorViewModel)Shell.Content!).IsTerkirim, "permintaan terkirim");
+        await Until(() => Has(w, "Analisis data Satria Data"), "permintaan tampil di daftar");
     }
 }

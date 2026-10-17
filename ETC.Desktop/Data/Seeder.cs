@@ -68,39 +68,93 @@ public static class Seeder
         new("Ir. Suhadi Lili, M.T.I.", null, "19690728 199303 1 001"),
     };
 
-    // NRP berformat asli (prodi + angkatan), nama fiktif kecuali tiga anggota Tim 3.
+    // Mahasiswa Teknik Informatika angkatan 23 sampai 26 (nama dan NRP asli).
     static readonly SeedMahasiswa[] Mahasiswa =
     {
-        new("Dewi Anggraeni", "Teknik Informatika", "5025231101", ["Java", "Spring Boot"]),
-        new("Eka Prasetyo", "Teknik Informatika", "5025231102", ["PHP", "Laravel"]),
-        new("Fina Maharani", "Teknik Informatika", "5025231103", ["R", "Statistika"]),
-        new("Gilang Saputra", "Teknik Informatika", "5025241101", ["PCB Design", "Microcontroller"]),
-        new("Hana Puspita", "Teknik Informatika", "5025241102", ["Data Science", "TensorFlow"]),
-        new("Ilham Maulana", "Teknik Informatika", "5025241103", ["Node.js", "Express"]),
+        new("Andrew Wallace", "Teknik Informatika", "5025231171", ["Java", "Spring Boot"]),
+        new("Amelia Nova Safitri", "Teknik Informatika", "5025231041", ["PHP", "Laravel"]),
+        new("Cathleen Gracia", "Teknik Informatika", "5025231018", ["R", "Statistika"]),
+        new("Bagus Cahya Saputra", "Teknik Informatika", "5025241067", ["PCB Design", "Microcontroller"]),
+        new("Nabila Shafa Rahayu", "Teknik Informatika", "5025241150", ["Data Science", "TensorFlow"]),
+        new("Dewey Sutjiadi", "Teknik Informatika", "5025241012", ["Node.js", "Express"]),
         new("Muhammad Abid Baihaqi Al Faridzi", "Teknik Informatika", "5025241133", ["UI/UX", "Figma"]),
         new("Lyonel Oliver Dwiputra", "Teknik Informatika", "5025241145", ["C++", "Arduino"]),
         new("Hosea Felix Sanjaya", "Teknik Informatika", "5025241177", ["Python", "React"]),
-        new("Jasmine Putri", "Teknik Informatika", "5025251101", ["Flutter", "Dart"]),
-        new("Kevin Hidayat", "Teknik Informatika", "5025251102", ["Go", "Microservices"]),
-        new("Laila Nur", "Teknik Informatika", "5025251103", ["SQL", "PostgreSQL"]),
-        new("Mario Setiawan", "Teknik Informatika", "5025261101", ["Networking", "Cisco"]),
-        new("Nadia Fitri", "Teknik Informatika", "5025261102", ["Machine Learning", "Python"]),
-        new("Omar Abdullah", "Teknik Informatika", "5025261103", ["Blockchain", "Web3"]),
-        new("Putri Ayu", "Rekayasa Perangkat Lunak", "5053261101", ["Algoritma", "Matematika Diskrit"]),
-        new("Rizki Ramadhan", "Rekayasa Perangkat Lunak", "5053261102", ["PLC", "SCADA"]),
-        new("Sari Wulandari", "Rekayasa Perangkat Lunak", "5053251101", ["DevOps", "Docker"]),
-        new("Taufik Hidayat", "Rekayasa Perangkat Lunak", "5053251102", ["SAP", "Business Process"]),
-        new("Ulfa Rahmawati", "Rekayasa Perangkat Lunak", "5053241101", ["Android", "Kotlin"]),
-        new("Vino Pratama", "Rekayasa Perangkat Lunak", "5053241102", ["React Native", "JavaScript"]),
-        new("Winda Sari", "Rekayasa Perangkat Lunak", "5053231101", ["Power BI", "Tableau"]),
-        new("Xander Putra", "Rekayasa Perangkat Lunak", "5053231102", ["Linux", "Shell Scripting"]),
-        new("Yuni Astuti", "Rekayasa Kecerdasan Artifisial", "5054261101", ["Vue.js", "TypeScript"]),
-        new("Zaki Maulana", "Rekayasa Kecerdasan Artifisial", "5054261102", ["Kubernetes", "AWS"]),
-        new("Adelia Putri", "Rekayasa Kecerdasan Artifisial", "5054251101", ["MATLAB", "Simulink"]),
-        new("Bagas Nugraha", "Rekayasa Kecerdasan Artifisial", "5054251102", ["Raspberry Pi", "Python"]),
-        new("Clara Octaviani", "Rekayasa Kecerdasan Artifisial", "5054241101", ["Swift", "iOS"]),
-        new("Dimas Saputro", "Rekayasa Kecerdasan Artifisial", "5054241102", ["GraphQL", "Apollo"]),
-        new("Erni Susanti", "Rekayasa Kecerdasan Artifisial", "5054231101", ["Unity", "C#"]),
+        new("Caroline Alverina", "Teknik Informatika", "5025251097", ["Flutter", "Dart"]),
+        new("Aston Justin", "Teknik Informatika", "5025251035", ["Go", "Microservices"]),
+        new("Gita Renada", "Teknik Informatika", "5025251105", ["SQL", "PostgreSQL"]),
+        new("Karin Witamso", "Teknik Informatika", "5025261014", ["Networking", "Cisco"]),
+        new("Fiona Angeline Halim", "Teknik Informatika", "5025261088", ["Machine Learning", "Python"]),
+        new("Richard Tan Raharjo", "Teknik Informatika", "5025261263", ["Blockchain", "Web3"]),
+        new("Dini Anggraini", "Teknik Informatika", "5025261027", ["Algoritma", "Matematika Diskrit"]),
+        new("Samuel Valentino", "Teknik Informatika", "5025261096", ["PLC", "SCADA"]),
+        new("Budiman Setiono", "Teknik Informatika", "5025251126", ["DevOps", "Docker"]),
+        new("Jessica Febiola", "Teknik Informatika", "5025251216", ["SAP", "Business Process"]),
+        new("Krisna Widhi Wijaya", "Teknik Informatika", "5025241166", ["Android", "Kotlin"]),
+        new("Stephanie Gabriella", "Teknik Informatika", "5025241081", ["React Native", "JavaScript"]),
+        new("Bella Angeline Chong", "Teknik Informatika", "5025231073", ["Power BI", "Tableau"]),
+        new("Dimas Surya Pratama", "Teknik Informatika", "5025231247", ["Linux", "Shell Scripting"]),
+        new("John Nathanael", "Teknik Informatika", "5025261162", ["Vue.js", "TypeScript"]),
+        new("Wilbert Bernardi", "Teknik Informatika", "5025261209", ["Kubernetes", "AWS"]),
+        new("Hasan Mohammadi", "Teknik Informatika", "5025251037", ["MATLAB", "Simulink"]),
+        new("Ilham Husni Pratama", "Teknik Informatika", "5025251073", ["Raspberry Pi", "Python"]),
+        new("Malvin Jonathan", "Teknik Informatika", "5025241238", ["Swift", "iOS"]),
+        new("Rendy Tanuwijaya", "Teknik Informatika", "5025241099", ["GraphQL", "Apollo"]),
+        new("Bradley Widjaja", "Teknik Informatika", "5025231036", ["Unity", "C#"]),
+        new("William Hans Chandra", "Teknik Informatika", "5025241138", ["Python", "Machine Learning"]),
+        new("Yoseph Kevin Hendrata", "Teknik Informatika", "5025241146", ["React", "TypeScript"]),
+        new("Hartmann Kanisius Galla' Massang", "Teknik Informatika", "5025241160", ["Node.js", "Express"]),
+        new("Uwais Achmad", "Teknik Informatika", "5025241103", ["Flutter", "Dart"]),
+        new("Bramantya Saputra", "Teknik Informatika", "5025241098", ["Figma", "UI/UX"]),
+        new("Naufal Fadlil Waafi", "Teknik Informatika", "5025241246", ["Java", "Spring Boot"]),
+        new("Rennard Filbert Tanjaya", "Teknik Informatika", "5025241122", ["Go", "Microservices"]),
+        new("Willy Marcelius", "Teknik Informatika", "5025241096", ["SQL", "PostgreSQL"]),
+        new("Nathanael Oliver Amadhika Yuswana", "Teknik Informatika", "5025241109", ["Docker", "DevOps"]),
+        new("Mathias Adya Diwangkara Suganda", "Teknik Informatika", "5025231015", ["Unity", "C#"]),
+        new("Faisal Azmi Sirajuddin", "Teknik Informatika", "5025231127", ["C++", "Algoritma"]),
+        new("Prinka Shafa Maharatri Achzania", "Teknik Informatika", "5025231262", ["Linux", "Networking"]),
+        new("Kartika Nana Naulita", "Teknik Informatika", "5025241021", ["Data Science", "Python"]),
+        new("Via Hana Nurma Putri", "Teknik Informatika", "5025241048", ["Statistika", "R"]),
+        new("Dilbina Windi Azahra", "Teknik Informatika", "5025241180", ["OpenCV", "Python"]),
+        new("Dyah Utami Kesuma Dewi", "Teknik Informatika", "5025241186", ["Arduino", "IoT"]),
+        new("Safa Mashita", "Teknik Informatika", "5025241022", ["Kotlin", "Android"]),
+        new("Devina Balqis Aurora", "Teknik Informatika", "5025241034", ["PyTorch", "Machine Learning"]),
+        new("Leyan Harits", "Teknik Informatika", "5025231288", ["Python", "Machine Learning"]),
+        new("Maleka Ghaniya", "Teknik Informatika", "5025241189", ["React", "TypeScript"]),
+        new("Jorell Ramos Sinaga", "Teknik Informatika", "5025241202", ["Node.js", "Express"]),
+        new("Jeyhan", "Teknik Informatika", "5025241132", ["Flutter", "Dart"]),
+        new("Haenu Narendra", "Teknik Informatika", "5025231272", ["Figma", "UI/UX"]),
+        new("Maulana Akbar", "Teknik Informatika", "5025231259", ["Java", "Spring Boot"]),
+        new("Kayana Danendra", "Teknik Informatika", "5025231286", ["Go", "Microservices"]),
+        new("Nabilah Bunga Sulistia", "Teknik Informatika", "5025241073", ["SQL", "PostgreSQL"]),
+        new("Callista Fidelya Roba Gultom", "Teknik Informatika", "5025241086", ["Docker", "DevOps"]),
+        new("Muhammad Akhdan Alwaafy", "Teknik Informatika", "5025241223", ["Unity", "C#"]),
+        new("Muhammad Daffa Ramadhan", "Teknik Informatika", "5025241216", ["C++", "Algoritma"]),
+        new("Raihan Rasyid", "Teknik Informatika", "5025241224", ["Linux", "Networking"]),
+        new("Bima Novrifa", "Teknik Informatika", "5025241194", ["Data Science", "Python"]),
+        new("Agil Lukman Hakim Muchdi", "Teknik Informatika", "5025241037", ["Statistika", "R"]),
+        new("Farrel Jatmiko Aji", "Teknik Informatika", "5025241193", ["OpenCV", "Python"]),
+        new("Berwyn Rafif Alvaro", "Teknik Informatika", "5025241029", ["Arduino", "IoT"]),
+        new("Muhammad Rivaldi Sholihin", "Teknik Informatika", "5025241188", ["Kotlin", "Android"]),
+        new("Rafael Mulia Wiratama Simarmata", "Teknik Informatika", "5025241196", ["PyTorch", "Machine Learning"]),
+        new("Nasyita Larasati Ertyananda", "Teknik Informatika", "5025241201", ["Python", "Machine Learning"]),
+        new("Rahma Sakinah", "Teknik Informatika", "5025241222", ["React", "TypeScript"]),
+        new("Safa Maulana Efendi", "Teknik Informatika", "5025241227", ["Node.js", "Express"]),
+        new("Aqil Syafiq Dzaky", "Teknik Informatika", "5025241200", ["Flutter", "Dart"]),
+        new("Derryell Josua Ekklesio Pandiangan", "Teknik Informatika", "5025241175", ["Figma", "UI/UX"]),
+        new("Achmad Najwa Maraf", "Teknik Informatika", "5025231265", ["Java", "Spring Boot"]),
+        new("Ahsin Khuluqil Karim", "Teknik Informatika", "5025241063", ["Go", "Microservices"]),
+        new("Azil Alriansyah Hidayat", "Teknik Informatika", "5025241070", ["SQL", "PostgreSQL"]),
+        new("Muhamad Aziz Romdhoni", "Teknik Informatika", "5025241071", ["Docker", "DevOps"]),
+        new("Umi Lailatul Khotimah", "Teknik Informatika", "5025241062", ["Unity", "C#"]),
+        new("M. Rizal Febrianto", "Teknik Informatika", "5025231258", ["C++", "Algoritma"]),
+        new("Kemal Tangguh Aji Rajasa", "Teknik Informatika", "5025231263", ["Linux", "Networking"]),
+        new("Ahmad Faiz Tajuddin", "Teknik Informatika", "5025231291", ["Data Science", "Python"]),
+        new("Liem Alfred Haryanto", "Teknik Informatika", "5025241100", ["Statistika", "R"]),
+        new("Danish Faiq Ibad Yuadi", "Teknik Informatika", "5025241038", ["OpenCV", "Python"]),
+        new("Fauzan Hafiz Amandani", "Teknik Informatika", "5025241087", ["Arduino", "IoT"]),
+        new("Nadine Aulia Putri Fanani", "Teknik Informatika", "5025231206", ["Kotlin", "Android"]),
+        new("Rafly Al Fahrezi", "Teknik Informatika", "5025241131", ["PyTorch", "Machine Learning"]),
     };
 
     // Creator adalah kode rumpun dosen pembuat, atau "demo" untuk akun Hosea.
@@ -174,9 +228,46 @@ public static class Seeder
         "Ide-idenya membuat solusi tim lebih matang.",
     };
 
+    // Bidang rumpun, dipakai sebagai keahlian dosen yang menjadi mentor.
+    static readonly Dictionary<string, string[]> BidangRumpun = new()
+    {
+        ["RPL"] = ["Software Engineering", "Requirement Analysis", "Software Testing"],
+        ["KBJ"] = ["Networking", "Keamanan Siber", "Cloud Computing"],
+        ["KCV"] = ["Computer Vision", "Machine Learning", "Python"],
+        ["AJK"] = ["IoT", "Jaringan Komputer", "Arduino"],
+        ["IGS"] = ["Game Development", "Unity", "UI/UX"],
+        ["AP"] = ["Algoritma", "C++", "Competitive Programming"],
+        ["MI"] = ["Data Mining", "Business Process", "SQL"],
+        ["DTK"] = ["Statistika", "MATLAB", "Matematika"],
+    };
+
+    // Mentor mahasiswa diambil dari angkatan 23; prestasinya karangan untuk demo.
+    record SeedMentorMhs(string Nrp, string[] Skills, string Pengalaman);
+
+    static readonly SeedMentorMhs[] MentorMahasiswa =
+    {
+        new("5025231171", ["Java", "Spring Boot", "System Design"],
+            "Finalis Gemastik XVII kategori Pengembangan Perangkat Lunak\nBackend intern di startup edutech selama 6 bulan\nAsisten praktikum Pemrograman Berorientasi Objek"),
+        new("5025231018", ["R", "Statistika", "Data Science"],
+            "Juara 2 lomba analisis data tingkat nasional 2025\nAsisten praktikum Statistika selama 2 semester"),
+        new("5025231036", ["Unity", "C#", "Game Development"],
+            "Juara 1 game jam regional 2025\nMerilis dua game indie di itch.io"),
+        new("5025231247", ["Linux", "Shell Scripting", "Networking"],
+            "Top 10 CTF tingkat mahasiswa 2025\nAsisten Laboratorium Arsitektur dan Jaringan Komputer"),
+    };
+
     public static void Seed(EtcDbContext db, DateTime? now = null)
     {
-        if (db.Users.Any()) return;
+        if (db.Users.Any())
+        {
+            // Database dari versi sebelumnya: tambahkan data mentor tanpa mengulang seluruh seed.
+            if (!db.Users.Any(u => u.IsMentor) && db.Users.Any(u => u.NoPengenal == DemoNrp))
+            {
+                SeedMentors(db, db.Users.ToList(), (now ?? DateTime.Now).Date);
+                db.SaveChanges();
+            }
+            return;
+        }
 
         var today = (now ?? DateTime.Now).Date;
         var rng = new Random(20261015);
@@ -244,6 +335,7 @@ public static class Seeder
                 TanggalSelesai = mulai.AddDays(s.DurasiHari),
                 Fee = s.Fee,
                 ContactPerson = $"wa.me/62{creator.NoTelp[1..]}",
+                LinkDetail = s.Judul.StartsWith("Gemastik") ? "https://gemastik.kemdikbud.go.id" : null,
                 CreatedAt = created,
             };
             var tim = new Tim { RekrutmenId = rek.RekrutmenId, TipeTim = s.Kegiatan, CreatedAt = created };
@@ -311,8 +403,78 @@ public static class Seeder
                      .Where(r => r.IsOpen && r.UserId != demo.UserId).Take(3).ToList())
             db.Bookmarks.Add(new Bookmark { RekrutmenId = r.RekrutmenId, UserId = demo.UserId });
 
+        SeedMentors(db, users, today);
         db.SaveChanges();
     }
+
+    public static int? AngkatanDariNrp(string nrp) =>
+        nrp.Length == 10 && nrp.All(char.IsDigit) ? 2000 + int.Parse(nrp[4..6]) : null;
+
+    static void SeedMentors(EtcDbContext db, List<User> users, DateTime today)
+    {
+        foreach (var m in users.Where(u => u.Role == UserRole.Mahasiswa))
+            m.Angkatan ??= AngkatanDariNrp(m.NoPengenal);
+
+        // Satu dosen per rumpun; dosen dengan NIP asli didahulukan supaya akun demo dosen ikut menjadi mentor.
+        foreach (var (code, bidang) in BidangRumpun)
+        {
+            var mentor = users.Where(u => u.Role == UserRole.Dosen && u.NoPengenal.StartsWith($"DEMO-{code}-") || IsDosenRumpun(u, code))
+                .OrderBy(u => u.NoPengenal.StartsWith("DEMO-")).FirstOrDefault();
+            if (mentor is null) continue;
+            mentor.IsMentor = true;
+            mentor.Spesialisasi = bidang.ToList();
+            mentor.Pengalaman = $"Dosen Departemen Teknik Informatika ITS\nRumpun {code} ({Rumpun[code]})";
+        }
+
+        foreach (var s in MentorMahasiswa)
+        {
+            var m = users.FirstOrDefault(u => u.NoPengenal == s.Nrp);
+            if (m is null) continue;
+            m.IsMentor = true;
+            m.Spesialisasi = s.Skills.ToList();
+            m.Pengalaman = s.Pengalaman;
+            m.LinkedInUrl = $"https://www.linkedin.com/in/{Slug(m.Nama)}";
+            m.PortofolioUrl = $"https://github.com/{Slug(m.Nama)}";
+        }
+
+        var demo = users.Single(u => u.NoPengenal == DemoNrp);
+        var mentors = users.Where(u => u.IsMentor).ToList();
+        User M(string nameOrNrp) => mentors.First(u => u.NoPengenal == nameOrNrp || u.Nama.Contains(nameOrNrp));
+        var mahasiswaLain = users.Where(u => u.Role == UserRole.Mahasiswa && !u.IsMentor && u != demo).ToList();
+
+        db.MentorRequests.AddRange(
+            new MentorRequest
+            {
+                MentorId = M("Diana Purwitasari").UserId, UserId = demo.UserId, Kegiatan = Kegiatan.Lomba,
+                Topik = "Persiapan Kompetisi AI Nasional",
+                Pesan = "Tim kami butuh arahan memilih arsitektur model dan strategi validasi sebelum babak penyisihan.",
+                Status = StatusBimbingan.Accepted, CreatedAt = today.AddDays(-20).AddHours(10), DecidedAt = today.AddDays(-18).AddHours(9),
+            },
+            new MentorRequest
+            {
+                MentorId = M("5025231171").UserId, UserId = demo.UserId, Kegiatan = Kegiatan.Projek,
+                Topik = "Review arsitektur backend aplikasi peminjaman lab",
+                Pesan = "Ingin minta masukan soal struktur API dan skema database sebelum mulai sprint pertama.",
+                CreatedAt = today.AddDays(-2).AddHours(14),
+            },
+            new MentorRequest
+            {
+                MentorId = M("Ary Mazharuddin").UserId, UserId = mahasiswaLain[0].UserId, Kegiatan = Kegiatan.Lomba,
+                Topik = "Strategi CTF kategori jaringan",
+                Pesan = "Kami baru pertama kali ikut CTF dan ingin tahu materi jaringan apa yang perlu dipelajari dulu.",
+                CreatedAt = today.AddDays(-1).AddHours(16),
+            },
+            new MentorRequest
+            {
+                MentorId = M("Ary Mazharuddin").UserId, UserId = mahasiswaLain[3].UserId, Kegiatan = Kegiatan.Riset,
+                Topik = "Topik tugas akhir keamanan IoT",
+                Pesan = "Saya tertarik dengan keamanan perangkat IoT dan ingin berdiskusi soal ruang lingkup yang realistis.",
+                CreatedAt = today.AddDays(-4).AddHours(11),
+            });
+    }
+
+    static bool IsDosenRumpun(User u, string code) =>
+        u.Role == UserRole.Dosen && Dosen.Any(d => d.Rumpun == code && d.Nip == u.NoPengenal);
 
     static History NewReview(Random rng, Guid target, Guid reviewer, Tim tim, DateTime selesai) => new()
     {

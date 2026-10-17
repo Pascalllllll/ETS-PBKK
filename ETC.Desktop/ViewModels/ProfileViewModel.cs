@@ -17,11 +17,18 @@ public partial class ProfileViewModel : ViewModelBase
     private readonly AuthService _auth;
     private readonly AppSettings _settings;
     private readonly User _user;
+    private readonly Session _session;
 
     [ObservableProperty] private string _nama;
     [ObservableProperty] private string? _jurusan;
     [ObservableProperty] private string _noTelp;
     [ObservableProperty] private string? _bio;
+    [ObservableProperty] private decimal? _angkatan;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(PengalamanCount))] private string? _pengalaman;
+    [ObservableProperty] private string? _linkedInUrl;
+    [ObservableProperty] private string? _portofolioUrl;
+    [ObservableProperty] private bool _isMentor;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasFoto))] private string? _fotoPath;
     [ObservableProperty] private string? _error;
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private AppearanceOption _appearance;
@@ -37,7 +44,10 @@ public partial class ProfileViewModel : ViewModelBase
         new(Services.Appearance.Dark, "Gelap"),
     ];
 
-    public string Initials => Format.Initials(Nama);
+    public bool IsMahasiswa => _user.Role == UserRole.Mahasiswa;
+    public bool HasFoto => FotoPath is not null;
+    public string PengalamanCount => $"{Pengalaman?.Length ?? 0}/1000";
+    public int MaxAngkatan => DateTime.Today.Year;
     public string Identitas => $"{Labels.Of(_user.Role)} · {_user.NoPengenal}";
     public string Bergabung => $"Bergabung {Format.Date(_user.CreatedAt)}";
     public string RatingText => Rating is { } r ? r.ToString("0.0") : "–";
@@ -49,11 +59,18 @@ public partial class ProfileViewModel : ViewModelBase
         _shell = shell;
         _auth = auth;
         _settings = settings;
+        _session = session;
         _user = session.CurrentUser!;
         _nama = _user.Nama;
         _jurusan = _user.Jurusan;
         _noTelp = _user.NoTelp;
         _bio = _user.Bio;
+        _angkatan = _user.Angkatan;
+        _pengalaman = _user.Pengalaman;
+        _linkedInUrl = _user.LinkedInUrl;
+        _portofolioUrl = _user.PortofolioUrl;
+        _isMentor = _user.IsMentor;
+        _fotoPath = _user.FotoPath;
         Skills = new TagListViewModel(_user.Spesialisasi);
         _appearance = AppearanceOptions.First(a => a.Value == settings.Appearance);
         _ = LoadReviews(pendaftar);
@@ -69,17 +86,37 @@ public partial class ProfileViewModel : ViewModelBase
     }
 
     partial void OnAppearanceChanged(AppearanceOption value) => _settings.SetAppearance(value.Value);
-    partial void OnNamaChanged(string value) => OnPropertyChanged(nameof(Initials));
 
     [RelayCommand]
     async Task Save()
     {
         IsBusy = true;
         Error = null;
-        var r = await _auth.UpdateProfileAsync(new ProfileUpdate(Nama, Jurusan, NoTelp, Bio, Skills.Items.ToList()));
+        var r = await _auth.UpdateProfileAsync(new ProfileUpdate(Nama, Jurusan, NoTelp, Bio, Skills.Items.ToList(),
+            Angkatan is { } a ? (int)a : null, Pengalaman, LinkedInUrl, PortofolioUrl, IsMentor));
         IsBusy = false;
-        if (r.Ok) _shell.ShowToast("Profil disimpan.");
+        if (r.Ok) _shell.ShowToast(IsMentor ? "Profil disimpan. Anda tampil di halaman Mentor." : "Profil disimpan.");
         else Error = r.Error;
+    }
+
+    [RelayCommand]
+    async Task ChangeFoto()
+    {
+        var file = await _shell.PickImageAsync("Pilih foto profil");
+        if (file is null) return;
+        await using var stream = await file.OpenReadAsync();
+        var r = await _auth.SetFotoAsync(stream, file.Name);
+        if (!r.Ok) { Error = r.Error; return; }
+        Error = null;
+        FotoPath = _session.CurrentUser?.FotoPath;
+        _shell.ShowToast("Foto profil diperbarui.");
+    }
+
+    [RelayCommand]
+    async Task RemoveFoto()
+    {
+        await _auth.RemoveFotoAsync();
+        FotoPath = null;
     }
 
     [RelayCommand]

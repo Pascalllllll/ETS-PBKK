@@ -25,7 +25,7 @@ public class PendaftarService(IDbContextFactory<EtcDbContext> factory, Session s
         return null;
     }
 
-    static bool IsUrl(string s) =>
+    internal static bool IsUrl(string? s) =>
         Uri.TryCreate(s?.Trim(), UriKind.Absolute, out var u) && (u.Scheme == Uri.UriSchemeHttps || u.Scheme == Uri.UriSchemeHttp);
 
     public async Task<Result> ApplyAsync(Guid rekrutmenId, ApplyInput input)

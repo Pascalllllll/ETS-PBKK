@@ -10,14 +10,15 @@
     <Grid ColumnDefinitions="3*,24,2*" Margin="36,8,36,40" MaxWidth="1100" HorizontalAlignment="Left">
       <StackPanel Spacing="18">
         <Grid ColumnDefinitions="Auto,*">
-          <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource Selection.Bg}">
-            <TextBlock Text="{Binding Initials}" FontSize="22" FontWeight="ExtraBold" Foreground="{DynamicResource Selection.Fg}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-          </Border>
+          <c:Avatar Nama="{Binding Nama}" FotoPath="{Binding FotoPath}" Size="72" VerticalAlignment="Top" />
           <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="2">
             <TextBlock Classes="h1" Text="{Binding Nama}" />
             <TextBlock Classes="secondary" Text="{Binding Identitas}" />
             <TextBlock Classes="caption" Text="{Binding Bergabung}" />
+            <StackPanel Orientation="Horizontal" Spacing="4" Margin="-8,4,0,0">
+              <Button Classes="plain" Content="Ganti foto" Command="{Binding ChangeFotoCommand}" />
+              <Button Classes="plain" Content="Hapus foto" Command="{Binding RemoveFotoCommand}" IsVisible="{Binding HasFoto}" />
+            </StackPanel>
           </StackPanel>
         </Grid>
 
@@ -38,16 +39,55 @@
                 <TextBox Text="{Binding NoTelp}" />
               </StackPanel>
             </Grid>
+            <StackPanel IsVisible="{Binding IsMahasiswa}">
+              <TextBlock Classes="field" Text="Angkatan" />
+              <NumericUpDown Value="{Binding Angkatan}" Minimum="2000" Maximum="{Binding MaxAngkatan}" Increment="1" FormatString="0"
+                             Width="160" HorizontalAlignment="Left" AutomationProperties.Name="Angkatan" />
+              <TextBlock Classes="hint" Text="Diisi otomatis dari NRP saat mendaftar." />
+            </StackPanel>
             <StackPanel>
               <TextBlock Classes="field" Text="Tentang saya" />
-              <TextBox Text="{Binding Bio}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxLength="300"
-                       Watermark="Pengalaman lomba, riset, atau projek yang relevan" />
+              <TextBox Text="{Binding Bio}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="56" MaxLength="300"
+                       Watermark="Satu atau dua kalimat tentang minat Anda" />
             </StackPanel>
             <StackPanel>
               <TextBlock Classes="field" Text="Keahlian" />
               <v:TagEditor DataContext="{Binding Skills}" />
               <TextBlock Classes="hint" Text="Dipakai untuk rekomendasi di Ringkasan dan ditampilkan ke pembuat rekrutmen." />
             </StackPanel>
+
+            <Border Classes="hairline" />
+            <TextBlock Classes="h2" Text="Pengalaman dan tautan" />
+            <StackPanel>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="field" Text="Pengalaman dan prestasi" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding PengalamanCount}" />
+              </Grid>
+              <TextBox Text="{Binding Pengalaman}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxLength="1000"
+                       Watermark="Satu pengalaman per baris, contoh: Finalis Gemastik 2025 kategori UX" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,16,*">
+              <StackPanel>
+                <TextBlock Classes="field" Text="LinkedIn (opsional)" />
+                <TextBox Text="{Binding LinkedInUrl}" Watermark="https://www.linkedin.com/in/nama" />
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Classes="field" Text="Portofolio (opsional)" />
+                <TextBox Text="{Binding PortofolioUrl}" Watermark="https://github.com/nama" />
+              </StackPanel>
+            </Grid>
+
+            <Border Classes="hairline" />
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="h2" Text="Jadi mentor" />
+                <TextBlock Classes="caption" TextWrapping="Wrap"
+                           Text="Profil, keahlian, dan pengalaman Anda tampil di halaman Mentor. Mahasiswa bisa mengirim permintaan bimbingan." />
+              </StackPanel>
+              <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsMentor}" OnContent="" OffContent="" VerticalAlignment="Center"
+                            Margin="16,0,0,0" AutomationProperties.Name="Tampilkan saya sebagai mentor" />
+            </Grid>
+
             <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
               <TextBlock Text="{Binding Error}" />
             </Border>

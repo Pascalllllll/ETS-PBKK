@@ -50,6 +50,13 @@
                   <TextBlock Text="Hubungi pembuat" VerticalAlignment="Center" />
                 </StackPanel>
               </Button>
+              <Button Margin="0,0,8,8" Command="{Binding OpenLinkDetailCommand}" MinHeight="34" IsVisible="{Binding HasLinkDetail}"
+                      ToolTip.Tip="{Binding Detail.LinkDetail, FallbackValue={x:Null}}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <c:Glyph Data="{StaticResource Icon.ArrowOutward}" Size="15" Foreground="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                  <TextBlock Text="Info lengkap" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
             </WrapPanel>
             <Border Background="{DynamicResource Bg.Inset}" CornerRadius="8" Padding="12,9" IsVisible="{Binding HasApplyState}">
               <TextBlock Text="{Binding ApplyState}" TextWrapping="Wrap" Foreground="{DynamicResource Text.Secondary}" />

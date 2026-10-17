@@ -47,6 +47,13 @@ public static class Labels
         _ => "Menunggu",
     };
 
+    public static string Of(StatusBimbingan s) => s switch
+    {
+        StatusBimbingan.Accepted => "Diterima",
+        StatusBimbingan.Rejected => "Ditolak",
+        _ => "Menunggu",
+    };
+
     public static string Of(UserRole r) => r == UserRole.Dosen ? "Dosen" : "Mahasiswa";
 
     public static readonly string[] Jurusan =

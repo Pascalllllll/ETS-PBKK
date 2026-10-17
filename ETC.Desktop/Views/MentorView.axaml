@@ -1,0 +1,201 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             xmlns:c="using:ETC.Desktop.Controls"
+             x:Class="ETC.Desktop.Views.MentorView"
+             x:DataType="vm:MentorViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="RequestRow" x:DataType="vm:MentorRequestRow">
+      <Border Classes="card" Padding="18,16" Margin="0,0,0,10">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <c:Avatar Nama="{Binding Nama}" FotoPath="{Binding FotoPath}" Size="40" VerticalAlignment="Top" />
+          <StackPanel Grid.Column="1" Margin="14,0" Spacing="3">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" FontSize="14" />
+              <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Pending.Bg}" IsVisible="{Binding IsPending}">
+                <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Pending.Fg}" />
+              </Border>
+              <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Success.Bg}" IsVisible="{Binding IsAccepted}">
+                <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Success.Fg}" />
+              </Border>
+              <Border CornerRadius="5" Padding="7,1" Background="{DynamicResource Danger.Bg}" IsVisible="{Binding IsRejected}">
+                <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Danger.Fg}" />
+              </Border>
+            </StackPanel>
+            <TextBlock Text="{Binding Topik}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Classes="secondary" Text="{Binding Pesan}" TextWrapping="Wrap" />
+            <TextBlock Classes="caption" Text="{Binding Meta}" Margin="0,2,0,0" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <Button Content="Batalkan" IsVisible="{Binding CanCancel}"
+                    Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).CancelCommand}" CommandParameter="{Binding}"
+                    AutomationProperties.Name="{Binding Topik, StringFormat='Batalkan permintaan {0}'}" />
+            <Button Classes="danger" Content="Tolak" IsVisible="{Binding CanDecide}"
+                    Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).RejectCommand}" CommandParameter="{Binding}"
+                    AutomationProperties.Name="{Binding Nama, StringFormat='Tolak permintaan {0}'}" />
+            <Button Classes="success" Content="Terima" IsVisible="{Binding CanDecide}"
+                    Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).AcceptCommand}" CommandParameter="{Binding}"
+                    AutomationProperties.Name="{Binding Nama, StringFormat='Terima permintaan {0}'}" />
+            <Button Content="Hubungi" IsVisible="{Binding IsAccepted}"
+                    Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).ContactCommand}" CommandParameter="{Binding}"
+                    AutomationProperties.Name="{Binding Nama, StringFormat='Hubungi {0} lewat WhatsApp'}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,*" Margin="36,8,24,0">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="h1" Text="Mentor" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="Dosen dan mahasiswa senior yang membuka bimbingan untuk lomba, riset, dan projek." />
+      </StackPanel>
+      <Button Grid.Column="1" Classes="primary" Command="{Binding NeedMentorCommand}" VerticalAlignment="Top" Margin="16,4,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Glyph Data="{StaticResource Icon.SchoolFill}" Size="16" Foreground="{DynamicResource Primary.Fg}" VerticalAlignment="Center" />
+          <TextBlock Text="Butuh mentor?" Foreground="{DynamicResource Primary.Fg}" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <WrapPanel Grid.Row="1" Margin="0,16,0,14">
+      <Border Margin="0,0,16,8" Classes="segmented">
+        <StackPanel Orientation="Horizontal">
+          <RadioButton Classes="segment" GroupName="mentorTab" Content="Daftar mentor" IsChecked="{Binding IsDaftar}" />
+          <RadioButton Classes="segment" GroupName="mentorTab" Content="{Binding TerkirimLabel}" IsChecked="{Binding IsTerkirim}" />
+          <RadioButton Classes="segment" GroupName="mentorTab" Content="{Binding MasukLabel}" IsChecked="{Binding IsMasuk}" IsVisible="{Binding IsMentor}" />
+        </StackPanel>
+      </Border>
+      <Panel Margin="0,0,8,8" Width="280" IsVisible="{Binding IsDaftar}">
+        <TextBox Classes="search" Text="{Binding SearchText}" Watermark="Cari nama, keahlian, atau prestasi"
+                 AutomationProperties.Name="Cari mentor" />
+        <c:Glyph Data="{StaticResource Icon.Search}" Size="16" Foreground="{DynamicResource Text.Tertiary}"
+                 HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False" />
+      </Panel>
+      <Border Margin="0,0,8,8" Classes="segmented" IsVisible="{Binding IsDaftar}">
+        <StackPanel Orientation="Horizontal">
+          <RadioButton Classes="segment" GroupName="mentorRole" Content="Semua" IsChecked="{Binding FilterAll}" />
+          <RadioButton Classes="segment" GroupName="mentorRole" Content="Dosen" IsChecked="{Binding FilterDosen}" />
+          <RadioButton Classes="segment" GroupName="mentorRole" Content="Mahasiswa" IsChecked="{Binding FilterMahasiswa}" />
+        </StackPanel>
+      </Border>
+    </WrapPanel>
+
+    <ScrollViewer Grid.Row="2">
+      <StackPanel Margin="0,0,12,40" Spacing="12">
+        <ProgressBar IsIndeterminate="True" Width="240" HorizontalAlignment="Left" IsVisible="{Binding IsLoading}" />
+        <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}" HorizontalAlignment="Left">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{Binding Error}" />
+            <Button Content="Coba lagi" Command="{Binding LoadCommand}" />
+          </StackPanel>
+        </Border>
+
+        <!-- Daftar mentor -->
+        <StackPanel Spacing="10" IsVisible="{Binding IsDaftar}">
+          <TextBlock Classes="caption" Text="{Binding CountText}" />
+          <StackPanel IsVisible="{Binding MentorsEmpty}" Spacing="10" Margin="0,16" MaxWidth="440" HorizontalAlignment="Left">
+            <c:Glyph Data="{StaticResource Icon.Search}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+            <TextBlock Classes="h3" Text="Tidak ada mentor yang cocok" />
+            <TextBlock Classes="secondary" TextWrapping="Wrap" Text="Coba kata kunci lain, misalnya nama keahlian seperti Python atau UI/UX." />
+            <Button Content="Hapus filter" Command="{Binding ClearFiltersCommand}" HorizontalAlignment="Left" />
+          </StackPanel>
+          <ItemsControl ItemsSource="{Binding Mentors}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:MentorCard">
+                <Border Classes="card" Width="316" Margin="0,0,14,14" Padding="18,16">
+                  <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <Grid ColumnDefinitions="Auto,*">
+                      <c:Avatar Nama="{Binding Nama}" FotoPath="{Binding FotoPath}" Size="52" VerticalAlignment="Top" />
+                      <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Classes="caption" Text="{Binding Subtitle}" TextWrapping="Wrap" />
+                        <Grid ColumnDefinitions="Auto,*" Margin="0,2,0,0">
+                          <c:Glyph Data="{StaticResource Icon.StarFill}" Size="13" Foreground="{DynamicResource Marker.Bg}" VerticalAlignment="Top" Margin="0,2,4,0" />
+                          <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Reputasi}" TextWrapping="Wrap" />
+                        </Grid>
+                      </StackPanel>
+                    </Grid>
+
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Skills}" Margin="0,14,0,0">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                          <Border Classes="chip" Padding="9,3"><TextBlock Text="{Binding}" /></Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Grid.Row="2" Spacing="6" Margin="0,10,0,0">
+                      <TextBlock Classes="group" Text="Pengalaman dan prestasi" />
+                      <ItemsControl ItemsSource="{Binding Pengalaman}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,4">
+                              <Border Width="5" Height="5" CornerRadius="3" Background="{DynamicResource Text.Tertiary}" VerticalAlignment="Top" Margin="0,7,9,0" />
+                              <TextBlock Grid.Column="1" Text="{Binding}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource Text.Secondary}" />
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+
+                    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
+                      <StackPanel Orientation="Horizontal" Spacing="2" Margin="-8,0,0,0">
+                        <Button Classes="plain" Content="LinkedIn" IsVisible="{Binding HasLinkedIn}"
+                                Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).OpenLinkedInCommand}" CommandParameter="{Binding}"
+                                AutomationProperties.Name="{Binding Nama, StringFormat='LinkedIn {0}'}" />
+                        <Button Classes="plain" Content="Portofolio" IsVisible="{Binding HasPortofolio}"
+                                Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).OpenPortofolioCommand}" CommandParameter="{Binding}"
+                                AutomationProperties.Name="{Binding Nama, StringFormat='Portofolio {0}'}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Content="Minta bimbingan"
+                              Command="{Binding $parent[UserControl].((vm:MentorViewModel)DataContext).NeedMentorCommand}" CommandParameter="{Binding}"
+                              AutomationProperties.Name="{Binding Nama, StringFormat='Minta bimbingan ke {0}'}" />
+                    </Grid>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Button Classes="plain" Content="Ingin membimbing juga? Aktifkan mode mentor di Profil" Command="{Binding EditProfileCommand}"
+                  IsVisible="{Binding !IsMentor}" HorizontalAlignment="Left" Margin="-8,0,0,0" />
+        </StackPanel>
+
+        <!-- Permintaan yang saya kirim -->
+        <StackPanel IsVisible="{Binding IsTerkirim}" MaxWidth="900" HorizontalAlignment="Left">
+          <Border Classes="card" IsVisible="{Binding TerkirimEmpty}">
+            <StackPanel Spacing="10">
+              <c:Glyph Data="{StaticResource Icon.SchoolFill}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+              <TextBlock Classes="h3" Text="Belum ada permintaan bimbingan" />
+              <TextBlock Classes="secondary" TextWrapping="Wrap"
+                         Text="Pilih mentor dengan keahlian yang Anda butuhkan, lalu ceritakan lomba atau projek yang sedang dikerjakan." />
+              <Button Classes="primary" Content="Butuh mentor?" Command="{Binding NeedMentorCommand}" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding Terkirim}" ItemTemplate="{StaticResource RequestRow}" />
+        </StackPanel>
+
+        <!-- Permintaan masuk untuk mentor -->
+        <StackPanel IsVisible="{Binding IsMasuk}" MaxWidth="900" HorizontalAlignment="Left">
+          <Border Classes="card" IsVisible="{Binding MasukEmpty}">
+            <StackPanel Spacing="10">
+              <c:Glyph Data="{StaticResource Icon.InboxFill}" Size="28" Foreground="{DynamicResource Text.Tertiary}" />
+              <TextBlock Classes="h3" Text="Belum ada permintaan masuk" />
+              <TextBlock Classes="secondary" TextWrapping="Wrap"
+                         Text="Profil Anda tampil di daftar mentor. Permintaan bimbingan dari mahasiswa akan muncul di sini." />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding Masuk}" ItemTemplate="{StaticResource RequestRow}" />
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

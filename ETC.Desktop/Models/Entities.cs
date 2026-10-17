@@ -7,6 +7,8 @@ public enum Kegiatan { Lomba, Riset, Projek }
 
 public enum StatusPendaftar { Pending, Accepted, Rejected }
 
+public enum StatusBimbingan { Pending, Accepted, Rejected }
+
 public class User
 {
     public Guid UserId { get; set; } = Guid.NewGuid();
@@ -18,6 +20,13 @@ public class User
     public string PasswordHash { get; set; } = "";
     public string? Bio { get; set; }
     public List<string> Spesialisasi { get; set; } = new();
+    public int? Angkatan { get; set; }
+    // Pengalaman dan prestasi, satu per baris.
+    public string? Pengalaman { get; set; }
+    public string? LinkedInUrl { get; set; }
+    public string? PortofolioUrl { get; set; }
+    public string? FotoPath { get; set; }
+    public bool IsMentor { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
@@ -44,6 +53,7 @@ public class Rekrutmen
     public DateTime TanggalSelesai { get; set; }
     public decimal? Fee { get; set; }
     public string ContactPerson { get; set; } = "";
+    public string? LinkDetail { get; set; }
     public bool IsOpen { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
@@ -116,5 +126,21 @@ public class Bookmark
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public Rekrutmen Rekrutmen { get; set; } = null!;
+    public User User { get; set; } = null!;
+}
+
+public class MentorRequest
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid MentorId { get; set; }
+    public Guid UserId { get; set; }
+    public Kegiatan Kegiatan { get; set; }
+    public string Topik { get; set; } = "";
+    public string Pesan { get; set; } = "";
+    public StatusBimbingan Status { get; set; } = StatusBimbingan.Pending;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime? DecidedAt { get; set; }
+
+    public User Mentor { get; set; } = null!;
     public User User { get; set; } = null!;
 }

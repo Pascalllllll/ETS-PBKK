@@ -13,6 +13,7 @@
     <KeyBinding Gesture="Ctrl+D4" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.RekrutmenSaya}" />
     <KeyBinding Gesture="Ctrl+D5" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.LamaranSaya}" />
     <KeyBinding Gesture="Ctrl+D6" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.TimSaya}" />
+    <KeyBinding Gesture="Ctrl+D7" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Mentor}" />
     <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Profil}" />
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewRekrutmenCommand}" />
     <KeyBinding Gesture="Ctrl+OemBackslash" Command="{Binding ToggleSidebarCommand}" />
@@ -89,6 +90,20 @@
                   <TextBlock Classes="navlabel" Text="Tim saya" VerticalAlignment="Center" />
                 </StackPanel>
               </RadioButton>
+              <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+7"
+                           IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Mentor}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <c:Glyph Data="{StaticResource Icon.SchoolFill}" Size="17" />
+                    <TextBlock Classes="navlabel" Text="Mentor" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="count" IsVisible="{Binding HasBimbinganMenunggu}"
+                          ToolTip.Tip="Permintaan bimbingan menunggu jawaban"
+                          AutomationProperties.Name="{Binding BimbinganMenunggu, StringFormat='{}{0} permintaan bimbingan menunggu'}">
+                    <TextBlock Text="{Binding BimbinganMenunggu}" />
+                  </Border>
+                </Grid>
+              </RadioButton>
               <RadioButton Classes="nav" GroupName="nav" ToolTip.Tip="Ctrl+,"
                            IsChecked="{Binding Page, Converter={x:Static v:EnumIsConverter.Instance}, ConverterParameter=Profil}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
@@ -101,10 +116,7 @@
 
           <Border Grid.Row="2" BorderBrush="{DynamicResource Line.Hairline}" BorderThickness="0,1,0,0" Padding="14,12">
             <Grid ColumnDefinitions="Auto,*,Auto">
-              <Border Width="30" Height="30" CornerRadius="15" Background="{DynamicResource Selection.Bg}">
-                <TextBlock Text="{Binding Initials}" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource Selection.Fg}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-              </Border>
+              <c:Avatar Nama="{Binding Nama}" FotoPath="{Binding FotoPath}" Size="30" />
               <StackPanel Grid.Column="1" Margin="9,0" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
                 <TextBlock Classes="caption" Text="{Binding RoleText}" FontSize="11" TextTrimming="CharacterEllipsis" />

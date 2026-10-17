@@ -17,7 +17,7 @@ public record RekrutmenQuery(
 public record RekrutmenInput(
     Kegiatan Kegiatan, string Judul, string Role, string Deskripsi, string Kriteria,
     IReadOnlyList<string> Skills, int Kuota, DateTime BatasPendaftaran,
-    DateTime TanggalMulai, DateTime TanggalSelesai, decimal? Fee, string ContactPerson);
+    DateTime TanggalMulai, DateTime TanggalSelesai, decimal? Fee, string ContactPerson, string? LinkDetail = null);
 
 public record RekrutmenSummary(
     Guid Id, Kegiatan Kegiatan, string Judul, string Role, IReadOnlyList<string> Skills,
@@ -27,7 +27,7 @@ public record RekrutmenSummary(
     DateTime CreatedAt);
 
 public record RekrutmenDetail(
-    RekrutmenSummary Summary, string Deskripsi, string Kriteria, string ContactPerson,
+    RekrutmenSummary Summary, string Deskripsi, string Kriteria, string ContactPerson, string? LinkDetail,
     string? PembuatJurusan, double? PembuatRating, int PembuatUlasan,
     StatusPendaftar? StatusSaya, bool IsMine);
 
@@ -91,7 +91,7 @@ public class RekrutmenService(IDbContextFactory<EtcDbContext> factory, Session s
         var mine = await db.Pendaftars.Where(p => p.RekrutmenId == id && p.UserId == me)
             .Select(p => (StatusPendaftar?)p.Status).FirstOrDefaultAsync();
 
-        return new RekrutmenDetail(summary, r.Deskripsi, r.Kriteria, r.ContactPerson, r.User.Jurusan,
+        return new RekrutmenDetail(summary, r.Deskripsi, r.Kriteria, r.ContactPerson, r.LinkDetail, r.User.Jurusan,
             ratings.Count > 0 ? ratings.Average() : null, ratings.Count, mine, r.UserId == me);
     }
 
@@ -113,6 +113,8 @@ public class RekrutmenService(IDbContextFactory<EtcDbContext> factory, Session s
         if (i.TanggalSelesai.Date < i.TanggalMulai.Date) return "Tanggal selesai harus setelah tanggal mulai.";
         if (i.Fee is < 0) return "Fee tidak boleh negatif.";
         if (string.IsNullOrWhiteSpace(i.ContactPerson)) return "Isi kontak yang bisa dihubungi.";
+        if (!string.IsNullOrWhiteSpace(i.LinkDetail) && !PendaftarService.IsUrl(i.LinkDetail))
+            return "Link detail harus diawali https://";
         return null;
     }
 
@@ -207,5 +209,6 @@ public class RekrutmenService(IDbContextFactory<EtcDbContext> factory, Session s
         r.TanggalSelesai = i.TanggalSelesai.Date;
         r.Fee = i.Fee;
         r.ContactPerson = i.ContactPerson.Trim();
+        r.LinkDetail = string.IsNullOrWhiteSpace(i.LinkDetail) ? null : i.LinkDetail.Trim();
     }
 }

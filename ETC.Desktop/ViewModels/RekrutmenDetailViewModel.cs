@@ -41,7 +41,7 @@ public partial class RekrutmenDetailViewModel : ViewModelBase
 
     void Notify()
     {
-        foreach (var n in new[] { nameof(Row), nameof(CanApply), nameof(ApplyState), nameof(HasApplyState), nameof(MatchText), nameof(PembuatRating), nameof(Periode), nameof(Batas), nameof(BatasRelatif) })
+        foreach (var n in new[] { nameof(Row), nameof(CanApply), nameof(ApplyState), nameof(HasApplyState), nameof(MatchText), nameof(PembuatRating), nameof(Periode), nameof(Batas), nameof(BatasRelatif), nameof(HasLinkDetail) })
             OnPropertyChanged(n);
     }
 
@@ -97,6 +97,14 @@ public partial class RekrutmenDetailViewModel : ViewModelBase
         if (Detail is null) return;
         var url = Detail.ContactPerson.StartsWith("http") ? Detail.ContactPerson : "https://" + Detail.ContactPerson;
         await _shell.OpenUrlAsync(url);
+    }
+
+    public bool HasLinkDetail => Detail?.LinkDetail is not null;
+
+    [RelayCommand]
+    async Task OpenLinkDetail()
+    {
+        if (Detail?.LinkDetail is { } url) await _shell.OpenUrlAsync(url);
     }
 
     [RelayCommand]

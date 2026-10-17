@@ -31,6 +31,39 @@
           </TextBlock>
         </StackPanel>
 
+        <Border Classes="card" IsVisible="{Binding ShowOnboarding}" Padding="22,18">
+          <Grid ColumnDefinitions="260,28,*">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="Lengkapi profil Anda" />
+              <TextBlock Classes="secondary" TextWrapping="Wrap"
+                         Text="Profil yang lengkap muncul lebih meyakinkan saat Anda melamar atau meminta bimbingan mentor." />
+              <ProgressBar Value="{Binding OnboardingProgress}" Maximum="100" Margin="0,6,0,0" />
+              <TextBlock Classes="caption" Text="{Binding OnboardingText}" />
+              <Button Classes="primary" Content="Lengkapi profil" Command="{Binding EditProfileCommand}" HorizontalAlignment="Left" Margin="0,6,0,0" />
+            </StackPanel>
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding Onboarding}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:OnboardingStep">
+                  <Grid ColumnDefinitions="Auto,*" Margin="0,0,16,12">
+                    <Panel Width="20" Height="20" VerticalAlignment="Top" Margin="0,1,10,0">
+                      <c:Glyph Data="{StaticResource Icon.CheckCircleFill}" Size="20" Foreground="{DynamicResource Success.Fg}" IsVisible="{Binding Done}" />
+                      <Border Width="17" Height="17" CornerRadius="9" BorderThickness="2" BorderBrush="{DynamicResource Line.Strong}"
+                              IsVisible="{Binding !Done}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Panel>
+                    <StackPanel Grid.Column="1" Spacing="1">
+                      <TextBlock Text="{Binding Label}" FontWeight="SemiBold" Classes.secondary="{Binding Done}" TextWrapping="Wrap" />
+                      <TextBlock Classes="caption" Text="{Binding Hint}" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </Border>
+
         <Grid ColumnDefinitions="3*,24,2*">
           <Border Classes="card" Padding="12,18,12,12">
             <StackPanel Spacing="6">

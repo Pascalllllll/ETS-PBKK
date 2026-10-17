@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ETC.Desktop.ViewModels;
 
-public enum Page { Ringkasan, Jelajahi, Tersimpan, RekrutmenSaya, LamaranSaya, TimSaya, Profil }
+public enum Page { Ringkasan, Jelajahi, Tersimpan, RekrutmenSaya, LamaranSaya, TimSaya, Mentor, Profil }
 
 public partial class ShellViewModel : ViewModelBase
 {
@@ -20,13 +20,15 @@ public partial class ShellViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasToast))] private string? _toast;
     [ObservableProperty] private bool _sidebarVisible = true;
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasPelamarMenunggu))] private int _pelamarMenunggu;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasBimbinganMenunggu))] private int _bimbinganMenunggu;
 
     public bool HasSheet => Sheet is not null;
     public bool HasToast => Toast is not null;
     public bool HasPelamarMenunggu => PelamarMenunggu > 0;
+    public bool HasBimbinganMenunggu => BimbinganMenunggu > 0;
 
     public string Nama => _session.CurrentUser?.Nama ?? "";
-    public string Initials => Format.Initials(Nama);
+    public string? FotoPath => _session.CurrentUser?.FotoPath;
     public string RoleText => _session.CurrentUser is { } u ? $"{Labels.Of(u.Role)} · {u.NoPengenal}" : "";
 
     public ShellViewModel(IServiceProvider sp, Session session, DashboardService dashboard)
@@ -37,7 +39,7 @@ public partial class ShellViewModel : ViewModelBase
         session.Changed += () =>
         {
             OnPropertyChanged(nameof(Nama));
-            OnPropertyChanged(nameof(Initials));
+            OnPropertyChanged(nameof(FotoPath));
             OnPropertyChanged(nameof(RoleText));
         };
         // Page sudah Ringkasan sejak awal, jadi setter tidak terpicu.
@@ -78,6 +80,7 @@ public partial class ShellViewModel : ViewModelBase
             Page.RekrutmenSaya => Create<MyRekrutmenViewModel>(focus ?? Guid.Empty),
             Page.LamaranSaya => Create<MyApplicationsViewModel>(),
             Page.TimSaya => Create<TeamsViewModel>(),
+            Page.Mentor => Create<MentorViewModel>(MentorTab.Daftar),
             _ => Create<ProfileViewModel>(),
         };
         _ = RefreshBadgesAsync();
@@ -87,6 +90,8 @@ public partial class ShellViewModel : ViewModelBase
     {
         try { PelamarMenunggu = (await _dashboard.LoadAsync()).PelamarMenunggu; }
         catch (Exception) { PelamarMenunggu = 0; }
+        try { BimbinganMenunggu = await _sp.GetRequiredService<MentorService>().PendingIncomingCountAsync(); }
+        catch (Exception) { BimbinganMenunggu = 0; }
     }
 
     public void OpenSheet(SheetViewModel sheet)
@@ -111,10 +116,25 @@ public partial class ShellViewModel : ViewModelBase
         catch (TaskCanceledException) { }
     }
 
+    static Avalonia.Controls.TopLevel? TopLevel =>
+        Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d
+            ? Avalonia.Controls.TopLevel.GetTopLevel(d.MainWindow) : null;
+
+    public async Task<Avalonia.Platform.Storage.IStorageFile?> PickImageAsync(string title)
+    {
+        if (TopLevel is not { } top) return null;
+        var files = await top.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+        {
+            Title = title,
+            AllowMultiple = false,
+            FileTypeFilter = [new Avalonia.Platform.Storage.FilePickerFileType("Gambar") { Patterns = ["*.jpg", "*.jpeg", "*.png", "*.webp"] }],
+        });
+        return files.FirstOrDefault();
+    }
+
     public async Task OpenUrlAsync(string url)
     {
-        var top = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d
-            ? Avalonia.Controls.TopLevel.GetTopLevel(d.MainWindow) : null;
+        var top = TopLevel;
         var ok = top is not null && Uri.TryCreate(url, UriKind.Absolute, out var uri) && await top.Launcher.LaunchUriAsync(uri);
         if (!ok) ShowToast($"Tidak bisa membuka {url}");
     }

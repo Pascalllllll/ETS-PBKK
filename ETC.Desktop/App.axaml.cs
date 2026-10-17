@@ -29,6 +29,7 @@ public class App : Application
         s.AddTransient<PendaftarService>();
         s.AddTransient<TimService>();
         s.AddTransient<DashboardService>();
+        s.AddTransient<MentorService>();
         s.AddSingleton<MainViewModel>();
         return s.BuildServiceProvider();
     }
@@ -40,6 +41,7 @@ public class App : Application
         using (var db = Services.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext())
         {
             db.Database.EnsureCreated();
+            SchemaUpgrade.Apply(db);
             Seeder.Seed(db);
         }
         Services.GetRequiredService<AppSettings>().Apply();

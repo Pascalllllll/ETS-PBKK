@@ -17,6 +17,7 @@ public sealed class TestDb : IDisposable
         Sp = App.BuildServices($"Data Source={_path};Pooling=False");
         using var db = Sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
         db.Database.EnsureCreated();
+        SchemaUpgrade.Apply(db);
         if (seed) Seeder.Seed(db);
     }
 
@@ -151,7 +152,7 @@ public class RekrutmenTests
     public async Task Bookmark_bisa_dipasang_dan_dilepas()
     {
         using var t = new TestDb();
-        await t.LoginAs("5025231101");
+        await t.LoginAs("5025231171");
         var svc = t.Get<RekrutmenService>();
         var target = (await svc.SearchAsync(new RekrutmenQuery())).Items[0];
         Assert.True(await svc.ToggleBookmarkAsync(target.Id));
@@ -280,5 +281,154 @@ public class TimDanDashboardTests
             Assert.False(db.Pendaftars.Any(p => p.UserId == me && p.RekrutmenId == r.Rekrutmen.Id));
         });
         Assert.True(d.KeahlianDicari.SequenceEqual(d.KeahlianDicari.OrderByDescending(s => s.Count).ThenBy(s => s.Skill)));
+    }
+}
+
+public class ProfilDanMentorTests
+{
+    static ProfileUpdate Profil(User u) => new(u.Nama, u.Jurusan, u.NoTelp, u.Bio, u.Spesialisasi,
+        u.Angkatan, u.Pengalaman, u.LinkedInUrl, u.PortofolioUrl, u.IsMentor);
+
+    [Fact]
+    public async Task Angkatan_diambil_dari_NRP_saat_daftar()
+    {
+        using var t = new TestDb(seed: false);
+        await t.Get<AuthService>().RegisterAsync(new RegisterRequest(
+            "Mahasiswa Baru", UserRole.Mahasiswa, "5025231234", null, "081211112222", ["Go"], "rahasia123", "rahasia123"));
+        Assert.Equal(2023, t.Get<Session>().CurrentUser!.Angkatan);
+    }
+
+    [Fact]
+    public async Task Profil_menyimpan_pengalaman_dan_tautan()
+    {
+        using var t = new TestDb();
+        await t.LoginAs("5025241177");
+        var u = t.Get<Session>().CurrentUser!;
+        var auth = t.Get<AuthService>();
+
+        Assert.False((await auth.UpdateProfileAsync(Profil(u) with { LinkedInUrl = "linkedin.com/in/hosea" })).Ok);
+        Assert.False((await auth.UpdateProfileAsync(Profil(u) with { Angkatan = 1990 })).Ok);
+        var r = await auth.UpdateProfileAsync(Profil(u) with
+        {
+            Pengalaman = "Finalis Gemastik 2025", LinkedInUrl = "https://www.linkedin.com/in/hosea", PortofolioUrl = " ",
+        });
+        Assert.True(r.Ok, r.Error);
+        u = t.Get<Session>().CurrentUser!;
+        Assert.Equal("Finalis Gemastik 2025", u.Pengalaman);
+        Assert.Null(u.PortofolioUrl);
+    }
+
+    [Fact]
+    public async Task Mentor_wajib_punya_pengalaman_dan_keahlian()
+    {
+        using var t = new TestDb();
+        await t.LoginAs("5025241177");
+        var u = t.Get<Session>().CurrentUser!;
+        var auth = t.Get<AuthService>();
+        Assert.False((await auth.UpdateProfileAsync(Profil(u) with { IsMentor = true, Pengalaman = null })).Ok);
+        Assert.False((await auth.UpdateProfileAsync(Profil(u) with { IsMentor = true, Pengalaman = "Asisten lab", Spesialisasi = [] })).Ok);
+        Assert.True((await auth.UpdateProfileAsync(Profil(u) with { IsMentor = true, Pengalaman = "Asisten lab" })).Ok);
+        Assert.True(t.Get<Session>().CurrentUser!.IsMentor);
+    }
+
+    [Fact]
+    public async Task Foto_profil_disalin_dan_formatnya_dicek()
+    {
+        using var t = new TestDb();
+        await t.LoginAs("5025241177");
+        var auth = t.Get<AuthService>();
+        Assert.False((await auth.SetFotoAsync(new MemoryStream([1, 2, 3]), "cv.pdf")).Ok);
+        Assert.True((await auth.SetFotoAsync(new MemoryStream([1, 2, 3]), "saya.PNG")).Ok);
+        var path = t.Get<Session>().CurrentUser!.FotoPath!;
+        Assert.True(File.Exists(path));
+        await auth.RemoveFotoAsync();
+        Assert.False(File.Exists(path));
+        Assert.Null(t.Get<Session>().CurrentUser!.FotoPath);
+    }
+
+    [Fact]
+    public void Link_detail_rekrutmen_opsional_tapi_harus_URL()
+    {
+        var i = new RekrutmenInput(Kegiatan.Lomba, "Gemastik", "Backend", "d", "k", ["Go"], 2,
+            DateTime.Today.AddDays(7), DateTime.Today.AddDays(10), DateTime.Today.AddDays(60), null, "wa.me/6281");
+        Assert.Null(RekrutmenService.Validate(i));
+        Assert.Null(RekrutmenService.Validate(i with { LinkDetail = "https://gemastik.kemdikbud.go.id" }));
+        Assert.NotNull(RekrutmenService.Validate(i with { LinkDetail = "gemastik" }));
+    }
+
+    [Fact]
+    public async Task Daftar_mentor_berisi_dosen_dan_mahasiswa_dan_bisa_dicari()
+    {
+        using var t = new TestDb();
+        await t.LoginAs("5025241177");
+        var mentor = t.Get<MentorService>();
+        var all = await mentor.ListAsync();
+        Assert.Contains(all, m => m.Role == UserRole.Dosen);
+        Assert.Contains(all, m => m.Role == UserRole.Mahasiswa && m.Pengalaman.Length > 0);
+        Assert.All(all, m => Assert.NotEmpty(m.Skills));
+        var unity = await mentor.ListAsync("unity");
+        Assert.NotEmpty(unity);
+        Assert.All(unity, m => Assert.Contains(m.Skills, s => s.Contains("Unity")));
+        Assert.All(await mentor.ListAsync(role: UserRole.Mahasiswa), m => Assert.Equal(UserRole.Mahasiswa, m.Role));
+    }
+
+    [Fact]
+    public async Task Alur_minta_bimbingan_lalu_mentor_menerima()
+    {
+        using var t = new TestDb();
+        await t.LoginAs("5025241145");
+        var svc = t.Get<MentorService>();
+        var ary = (await svc.ListAsync("Ary")).Single();
+        var input = new MentorRequestInput(ary.UserId, Kegiatan.Riset, "Topik tugas akhir", "Saya ingin berdiskusi soal keamanan jaringan kampus.");
+
+        Assert.NotNull(MentorService.Validate(input with { Pesan = "pendek" }));
+        Assert.True((await svc.RequestAsync(input)).Ok);
+        Assert.False((await svc.RequestAsync(input)).Ok); // masih menunggu, tidak boleh dobel
+        var sent = Assert.Single(await svc.SentAsync());
+        Assert.False((await svc.DecideAsync(sent.Id, true)).Ok); // bukan mentornya
+
+        t.Get<AuthService>().Logout();
+        await t.LoginAs("19810620 200501 1 003");
+        var incoming = await svc.IncomingAsync();
+        Assert.Equal(StatusBimbingan.Pending, incoming[0].Status);
+        var mine = incoming.Single(r => r.Id == sent.Id);
+        Assert.True((await svc.DecideAsync(mine.Id, true)).Ok);
+        Assert.False((await svc.DecideAsync(mine.Id, false)).Ok);
+
+        t.Get<AuthService>().Logout();
+        await t.LoginAs("5025241145");
+        Assert.Equal(StatusBimbingan.Accepted, (await svc.SentAsync()).Single().Status);
+        Assert.False((await svc.CancelAsync(sent.Id)).Ok);
+    }
+
+    [Fact]
+    public async Task Database_versi_lama_ditambah_kolom_dan_data_mentor()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"etc-old-{Guid.NewGuid():N}.db");
+        try
+        {
+            using (var sp = App.BuildServices($"Data Source={path};Pooling=False"))
+            {
+                using var db = sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
+                db.Database.EnsureCreated();
+                Seeder.Seed(db);
+                // Tiru database sebelum fitur mentor.
+                db.Database.ExecuteSqlRaw("DROP TABLE MentorRequests");
+                foreach (var c in new[] { "Angkatan", "Pengalaman", "LinkedInUrl", "PortofolioUrl", "FotoPath", "IsMentor" })
+                    db.Database.ExecuteSqlRaw($"ALTER TABLE Users DROP COLUMN {c}");
+                db.Database.ExecuteSqlRaw("ALTER TABLE Rekrutmens DROP COLUMN LinkDetail");
+            }
+            using (var sp = App.BuildServices($"Data Source={path};Pooling=False"))
+            {
+                using var db = sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
+                SchemaUpgrade.Apply(db);
+                Seeder.Seed(db);
+                Assert.True(db.Users.Count(u => u.IsMentor) >= 8);
+                Assert.Equal(2024, db.Users.Single(u => u.NoPengenal == "5025241177").Angkatan);
+                Assert.NotEmpty(db.MentorRequests);
+                Assert.True(db.Rekrutmens.Any()); // data lama tetap ada
+            }
+        }
+        finally { try { File.Delete(path); } catch (IOException) { } }
     }
 }

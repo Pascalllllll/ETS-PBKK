@@ -24,13 +24,13 @@ Saat pertama dijalankan, aplikasi membuat database SQLite dan mengisinya dengan 
 | Prof. Ir. Ary Mazharuddin Shiddiqi (dosen) | `19810620 200501 1 003` | `etc12345` |
 | Henning Titi Ciptaningtyas (dosen) | `19840708 201012 2 004` | `etc12345` |
 
-Dosen demo adalah 35 dosen Departemen Teknik Informatika ITS, dikelompokkan per rumpun (RPL, KBJ, KCV, AJK, IGS, AP, MI, DTK). Dosen yang NIP-nya belum tersedia memakai ID `DEMO-<rumpun>-<nomor>`. Mahasiswa selain anggota Tim 3 adalah nama fiktif dengan NRP berformat asli: Teknik Informatika `5025`, Rekayasa Perangkat Lunak `5053`, dan Rekayasa Kecerdasan Artifisial `5054`, angkatan 23 sampai 26.
+Dosen demo adalah 35 dosen Departemen Teknik Informatika ITS, dikelompokkan per rumpun (RPL, KBJ, KCV, AJK, IGS, AP, MI, DTK). Dosen yang NIP-nya belum tersedia memakai ID `DEMO-<rumpun>-<nomor>`. Mahasiswa demo adalah 84 mahasiswa Teknik Informatika (`5025`) angkatan 23 sampai 26 dengan nama dan NRP asli, diambil dari daftar mahasiswa departemen. Lamaran, keputusan, ulasan, dan prestasi mentor mereka adalah data karangan untuk demo.
 
 NRP mahasiswa 10 digit. NIP dosen 18 digit dan boleh diketik dengan atau tanpa spasi.
 
 Layar masuk juga punya tombol **Isi akun mahasiswa** dan **Isi akun dosen**.
 
-Lokasi database: `~/.local/share/ETC/etc.db` (Linux), `%LOCALAPPDATA%\ETC\etc.db` (Windows), `~/Library/Application Support/ETC/etc.db` (macOS). Hapus file itu untuk mengulang data demo.
+Lokasi database: `~/.local/share/ETC/etc.db` (Linux), `%LOCALAPPDATA%\ETC\etc.db` (Windows), `~/Library/Application Support/ETC/etc.db` (macOS). Hapus file itu untuk mengulang data demo. Database dari versi sebelumnya tetap bisa dipakai: kolom dan tabel baru ditambahkan otomatis saat aplikasi dibuka. Foto profil disimpan di subfolder `foto` di folder data yang sama.
 
 ## Fitur
 
@@ -39,20 +39,23 @@ Lokasi database: `~/.local/share/ETC/etc.db` (Linux), `%LOCALAPPDATA%\ETC\etc.db
 - **Rekrutmen saya**: buat, ubah, tutup/buka, hapus; tinjau pelamar beserta kecocokan keahlian, reputasi, dan ulasan.
 - **Lamaran saya**: status lamaran, batalkan yang masih menunggu.
 - **Tim saya**: anggota tim, kontak WhatsApp, ulasan bintang setelah kegiatan selesai.
-- **Profil**: data diri, keahlian, rating dan ulasan yang diterima, mode terang/gelap.
+- **Mentor**: daftar dosen dan mahasiswa senior beserta foto, keahlian, dan prestasi; cari dan filter; tombol **Butuh mentor?** membuka formulir permintaan bimbingan. Mentor menerima atau menolak permintaan di tab Permintaan masuk.
+- **Profil**: foto, angkatan, keahlian, pengalaman dan prestasi, tautan LinkedIn/portofolio, mode mentor, rating dan ulasan yang diterima, mode terang/gelap.
 
-Shortcut: Ctrl+1 sampai Ctrl+6 untuk halaman, Ctrl+N buka rekrutmen, Ctrl+F cari, Ctrl+\\ sidebar, Escape tutup sheet.
+Ringkasan juga menampilkan kartu **Lengkapi profil Anda** sampai semua langkah profil selesai. Rekrutmen bisa diberi link detail opsional (guidebook atau halaman resmi lomba).
+
+Shortcut: Ctrl+1 sampai Ctrl+7 untuk halaman, Ctrl+N buka rekrutmen, Ctrl+F cari, Ctrl+\\ sidebar, Escape tutup sheet.
 
 ## Struktur
 
 ```
 ETC.Desktop/
-  Models/        Entitas (User, Rekrutmen, Pendaftar, Tim, TimParticipant, History, Bookmark)
-  Data/          EtcDbContext (EF Core) dan Seeder
-  Services/      Logika bisnis dan validasi (Auth, Rekrutmen, Pendaftar, Tim, Dashboard)
+  Models/        Entitas (User, Rekrutmen, Pendaftar, Tim, TimParticipant, History, Bookmark, MentorRequest)
+  Data/          EtcDbContext (EF Core), SchemaUpgrade, dan Seeder
+  Services/      Logika bisnis dan validasi (Auth, Rekrutmen, Pendaftar, Tim, Dashboard, Mentor)
   ViewModels/    MVVM dengan CommunityToolkit.Mvvm
   Views/         XAML Avalonia
-  Controls/      Glyph (ikon) dan grafik kustom (batang bertumpuk, batang horizontal, meter status)
+  Controls/      Glyph (ikon), Avatar (foto atau inisial), dan grafik kustom (batang bertumpuk, batang horizontal, meter status)
   Styles/        Token warna terang/gelap, gaya kontrol, ikon
 ETC.Tests/       xUnit: test service dan test UI headless
 docs/            PRD dan screenshot
@@ -64,7 +67,7 @@ docs/            PRD dan screenshot
 dotnet test
 ```
 
-41 test: aturan bisnis di service, plus klik-tembus UI dengan Avalonia Headless (masuk, navigasi sidebar, melamar, menerima pelamar, ulasan, hapus dengan konfirmasi, shortcut keyboard, mode gelap).
+51 test: aturan bisnis di service, plus klik-tembus UI dengan Avalonia Headless (masuk, navigasi sidebar, melamar, menerima pelamar, ulasan, hapus dengan konfirmasi, shortcut keyboard, mode gelap, onboarding profil, permintaan mentor).
 
 ## Screenshot untuk dokumentasi
 

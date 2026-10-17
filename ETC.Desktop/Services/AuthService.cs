@@ -9,7 +9,9 @@ public record RegisterRequest(
     string Nama, UserRole Role, string NoPengenal, string? Jurusan, string NoTelp,
     IReadOnlyList<string> Spesialisasi, string Password, string ConfirmPassword);
 
-public record ProfileUpdate(string Nama, string? Jurusan, string NoTelp, string? Bio, IReadOnlyList<string> Spesialisasi);
+public record ProfileUpdate(
+    string Nama, string? Jurusan, string NoTelp, string? Bio, IReadOnlyList<string> Spesialisasi,
+    int? Angkatan, string? Pengalaman, string? LinkedInUrl, string? PortofolioUrl, bool IsMentor);
 
 public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Session session)
 {
@@ -86,6 +88,7 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
             Jurusan = string.IsNullOrWhiteSpace(r.Jurusan) ? null : r.Jurusan,
             NoTelp = r.NoTelp.Trim(),
             Spesialisasi = r.Spesialisasi.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+            Angkatan = r.Role == UserRole.Mahasiswa ? Seeder.AngkatanDariNrp(no) : null,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(r.Password, 10),
         };
         db.Users.Add(user);
@@ -94,10 +97,24 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
         return Result.Success();
     }
 
+    public static string? ValidateProfile(ProfileUpdate p)
+    {
+        if ((ValidateNama(p.Nama) ?? ValidateContact(p.NoTelp)) is { } err) return err;
+        if (p.Angkatan is { } a && (a < 2000 || a > DateTime.Today.Year)) return $"Angkatan antara 2000 dan {DateTime.Today.Year}.";
+        if (!string.IsNullOrWhiteSpace(p.LinkedInUrl) && !PendaftarService.IsUrl(p.LinkedInUrl))
+            return "Tautan LinkedIn harus diawali https://";
+        if (!string.IsNullOrWhiteSpace(p.PortofolioUrl) && !PendaftarService.IsUrl(p.PortofolioUrl))
+            return "Tautan portofolio harus diawali https://";
+        if (p.Pengalaman is { Length: > 1000 }) return "Pengalaman maksimal 1000 karakter.";
+        if (p.IsMentor && string.IsNullOrWhiteSpace(p.Pengalaman))
+            return "Tulis pengalaman atau prestasi Anda sebelum tampil sebagai mentor.";
+        if (p.IsMentor && p.Spesialisasi.Count == 0) return "Tambahkan minimal satu keahlian sebelum tampil sebagai mentor.";
+        return null;
+    }
+
     public async Task<Result> UpdateProfileAsync(ProfileUpdate p)
     {
-        var err = ValidateNama(p.Nama) ?? ValidateContact(p.NoTelp);
-        if (err is not null) return Result.Fail(err);
+        if (ValidateProfile(p) is { } err) return Result.Fail(err);
 
         await using var db = await factory.CreateDbContextAsync();
         var user = await db.Users.FirstAsync(u => u.UserId == session.UserId);
@@ -106,7 +123,51 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
         user.NoTelp = p.NoTelp.Trim();
         user.Bio = string.IsNullOrWhiteSpace(p.Bio) ? null : p.Bio.Trim();
         user.Spesialisasi = p.Spesialisasi.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        user.Angkatan = user.Role == UserRole.Mahasiswa ? p.Angkatan : null;
+        user.Pengalaman = Clean(p.Pengalaman);
+        user.LinkedInUrl = Clean(p.LinkedInUrl);
+        user.PortofolioUrl = Clean(p.PortofolioUrl);
+        user.IsMentor = p.IsMentor;
         user.UpdatedAt = DateTime.Now;
+        await db.SaveChangesAsync();
+        session.Refresh(user);
+        return Result.Success();
+    }
+
+    static string? Clean(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
+
+    static readonly string[] FotoExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+
+    // Foto disalin ke folder data aplikasi agar tetap ada walau berkas aslinya dipindah.
+    public async Task<Result> SetFotoAsync(Stream source, string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        if (!FotoExtensions.Contains(ext)) return Result.Fail("Foto harus berformat JPG, PNG, atau WebP.");
+        if (source.CanSeek && source.Length > 5 * 1024 * 1024) return Result.Fail("Ukuran foto maksimal 5 MB.");
+
+        await using var db = await factory.CreateDbContextAsync();
+        var user = await db.Users.FirstAsync(u => u.UserId == session.UserId);
+        var dir = Path.Combine(AppPaths.DataDir, "foto");
+        Directory.CreateDirectory(dir);
+        // Nama berkas baru tiap unggah, supaya cache gambar tidak menampilkan foto lama.
+        var path = Path.Combine(dir, $"{user.UserId:N}-{DateTime.Now:yyyyMMddHHmmss}{ext}");
+        await using (var dest = File.Create(path)) await source.CopyToAsync(dest);
+
+        var old = user.FotoPath;
+        user.FotoPath = path;
+        user.UpdatedAt = DateTime.Now;
+        await db.SaveChangesAsync();
+        if (old is not null && old != path) try { File.Delete(old); } catch (IOException) { }
+        session.Refresh(user);
+        return Result.Success();
+    }
+
+    public async Task<Result> RemoveFotoAsync()
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var user = await db.Users.FirstAsync(u => u.UserId == session.UserId);
+        if (user.FotoPath is { } old) try { File.Delete(old); } catch (IOException) { }
+        user.FotoPath = null;
         await db.SaveChangesAsync();
         session.Refresh(user);
         return Result.Success();

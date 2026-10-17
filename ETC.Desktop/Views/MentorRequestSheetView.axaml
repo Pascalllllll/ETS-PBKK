@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ETC.Desktop.ViewModels"
+             x:Class="ETC.Desktop.Views.MentorRequestSheetView"
+             x:DataType="vm:MentorRequestSheetViewModel">
+  <StackPanel Margin="28,26" Spacing="16">
+    <StackPanel Spacing="3">
+      <TextBlock Classes="h2" Text="Minta bimbingan mentor" />
+      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                 Text="Mentor membaca permintaan Anda lalu menerima atau menolak. Bila diterima, kontak WhatsApp mentor terbuka di Permintaan saya." />
+    </StackPanel>
+    <StackPanel>
+      <TextBlock Classes="field" Text="Mentor" />
+      <ComboBox ItemsSource="{Binding Mentors}" SelectedItem="{Binding Mentor}" PlaceholderText="Pilih mentor"
+                HorizontalAlignment="Stretch" AutomationProperties.Name="Mentor" />
+    </StackPanel>
+    <StackPanel>
+      <TextBlock Classes="field" Text="Untuk kegiatan" />
+      <Border Classes="segmented" HorizontalAlignment="Left">
+        <StackPanel Orientation="Horizontal">
+          <RadioButton Classes="segment" GroupName="mentorKegiatan" Content="Lomba" IsChecked="{Binding IsLomba}" />
+          <RadioButton Classes="segment" GroupName="mentorKegiatan" Content="Riset" IsChecked="{Binding IsRiset}" />
+          <RadioButton Classes="segment" GroupName="mentorKegiatan" Content="Projek" IsChecked="{Binding IsProjek}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+    <StackPanel>
+      <TextBlock Classes="field" Text="Topik bimbingan" />
+      <TextBox Text="{Binding Topik}" MaxLength="120" Watermark="Contoh: Persiapan proposal Gemastik kategori UX" />
+    </StackPanel>
+    <StackPanel>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="field" Text="Apa yang Anda butuhkan?" />
+        <TextBlock Grid.Column="1" Classes="caption" Text="{Binding PesanCount}" />
+      </Grid>
+      <TextBox Text="{Binding Pesan}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110" MaxLength="800"
+               Watermark="Ceritakan kondisi tim, tenggat, dan bagian yang ingin dibahas" />
+    </StackPanel>
+    <Border Classes="error" IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock Text="{Binding Error}" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Batal" Command="{Binding CancelCommand}" />
+      <Button Classes="primary" Content="Kirim permintaan" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

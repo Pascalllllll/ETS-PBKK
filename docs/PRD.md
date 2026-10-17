@@ -9,7 +9,7 @@
 | Platform | Aplikasi desktop (Windows, Linux, macOS) |
 | Bahasa dan kerangka kerja | C# (.NET 8), Avalonia UI 11, Entity Framework Core 8 (SQLite), CommunityToolkit.Mvvm |
 | Referensi | Pitch deck *Elite TC Champions*, repositori [etc-be](https://github.com/Arthamna/etc-be) (Go) dan [etc-fe](https://github.com/Arthamna/etc-fe) (Next.js) |
-| Status dokumen | Versi 1.0, sesuai implementasi di folder `ETC.Desktop` |
+| Status dokumen | Versi 1.1, sesuai implementasi di folder `ETC.Desktop` (menambah halaman Mentor, profil lengkap, dan onboarding di Ringkasan) |
 
 ---
 
@@ -33,13 +33,15 @@ Membangun platform terpusat yang menghubungkan mahasiswa dan dosen dalam mencari
 | Mengatasi *information gap* | Semua rekrutmen ada di satu daftar yang bisa dicari, difilter, dan disimpan. |
 | Mengatasi *department gap* | Pencarian berdasarkan keahlian, bukan jurusan; rekomendasi lintas jurusan di Ringkasan. |
 | Mengatasi *skill matching problem* | Setiap rekrutmen mencantumkan keahlian yang dicari; aplikasi menandai keahlian yang cocok, baik di sisi pelamar maupun perekrut. |
+| Mengatasi *kurang pembimbing* | Halaman Mentor berisi dosen dan mahasiswa senior beserta keahlian dan prestasinya; tombol "Butuh mentor?" membuka formulir permintaan bimbingan. |
 | Mengatasi *trust barrier* | Rating dan ulasan antar-rekan tim setelah kegiatan selesai, ditampilkan saat perekrut meninjau pelamar. |
 
 ## 3. Ruang lingkup
 
 **Termasuk (versi ini):**
 
-- Masuk, daftar akun dengan onboarding tiga langkah, dan profil.
+- Masuk, daftar akun dengan onboarding tiga langkah, dan profil (foto, angkatan, keahlian, pengalaman, tautan LinkedIn/portofolio).
+- Daftar mentor dan permintaan bimbingan (kirim, batalkan, terima/tolak oleh mentor).
 - Membuat, mengubah, menutup/membuka kembali, dan menghapus rekrutmen.
 - Jelajahi rekrutmen: pencarian teks, filter jenis kegiatan, urutan, paginasi, dan detail.
 - Simpan (bookmark) rekrutmen.
@@ -47,7 +49,7 @@ Membangun platform terpusat yang menghubungkan mahasiswa dan dosen dalam mencari
 - Meninjau pelamar (keahlian, reputasi, ulasan), lalu menerima atau menolak.
 - Tim otomatis terbentuk dari pelamar yang diterima; daftar anggota dan kontak.
 - Ulasan dan rating antar-anggota setelah kegiatan selesai.
-- Dashboard (Ringkasan) dengan grafik interaktif.
+- Dashboard (Ringkasan) dengan kartu onboarding "Lengkapi profil" dan grafik interaktif.
 - Mode terang dan gelap, shortcut keyboard.
 
 **Tidak termasuk (versi berikutnya):**
@@ -64,7 +66,8 @@ Aktor dan aksi diambil dari pitch deck (slide 06).
 | Aktor | Kebutuhan utama | Aksi di aplikasi |
 |---|---|---|
 | **Mahasiswa** | Menemukan tim lomba, posisi asisten riset, atau projek yang sesuai keahlian; juga merekrut teman untuk lomba. | Mendaftar rekrutmen, mencari rekrutmen, membuat rekrutmen, melihat riwayat pendaftar rekrutmen, memberi ulasan rekan tim. |
-| **Dosen** | Merekrut asisten riset atau anggota projek yang bisa dipercaya. | Membuat rekrutmen, melihat riwayat pendaftar rekrutmen, mencari rekrutmen, memberi ulasan anggota tim. |
+| **Dosen** | Merekrut asisten riset atau anggota projek yang bisa dipercaya. | Membuat rekrutmen, melihat riwayat pendaftar rekrutmen, mencari rekrutmen, memberi ulasan anggota tim, menjawab permintaan bimbingan. |
+| **Mentor** | Dosen atau mahasiswa senior yang mau membimbing tim lomba, riset, atau projek. | Mengaktifkan mode mentor di Profil, lalu menerima atau menolak permintaan bimbingan. |
 
 Kedua aktor memakai fitur yang sama; perbedaannya ada pada identitas (NRP untuk mahasiswa, NIP untuk dosen) dan konteks pemakaian.
 
@@ -101,7 +104,8 @@ Prioritas: **W** = wajib untuk ETS, **P** = penting. Kolom terakhir menunjukkan 
 | F-01 | Pengguna masuk dengan NRP/NIP dan kata sandi. Pesan salah tidak membedakan "akun tidak ada" dan "kata sandi salah". | W | `AuthService.LoginAsync` |
 | F-02 | Daftar akun dalam tiga langkah: (1) peran, nama, NRP/NIP; (2) departemen, nomor WhatsApp; (3) keahlian, kata sandi. Setiap langkah divalidasi sebelum lanjut. | W | `AuthViewModel`, `AuthView` |
 | F-03 | NRP/NIP unik. NRP 10 digit (format 5025241XXX); NIP 18 digit, disimpan dengan pengelompokan baku (19810620 200501 1 003) sehingga bisa diketik dengan atau tanpa spasi. Kata sandi minimal 8 karakter dan disimpan sebagai hash bcrypt. | W | `AuthService.RegisterAsync`, `NormalizeNoPengenal` |
-| F-04 | Pengguna mengubah nama, departemen, nomor WhatsApp, bio, dan keahlian. | W | `ProfileViewModel` |
+| F-04 | Pengguna mengubah nama, departemen, nomor WhatsApp, bio, keahlian, angkatan (mahasiswa), pengalaman dan prestasi (maksimal 1000 karakter, satu per baris), serta tautan LinkedIn dan portofolio (opsional, harus URL http/https). Angkatan diisi otomatis dari NRP saat mendaftar (5025**24**1177 → 2024). | W | `ProfileViewModel`, `AuthService.ValidateProfile` |
+| F-07 | Pengguna mengganti atau menghapus foto profil (JPG, PNG, WebP, maksimal 5 MB). Foto disalin ke folder data aplikasi dan dipakai di sidebar, profil, dan kartu mentor; tanpa foto, inisial nama ditampilkan. | P | `AuthService.SetFotoAsync`, `Controls/Avatar` |
 | F-05 | Profil menampilkan rata-rata rating dan daftar ulasan dari rekan tim. | P | `ProfileView` |
 | F-06 | Pengguna memilih mode tampilan: ikuti sistem, terang, atau gelap. | P | `AppSettings` |
 
@@ -109,12 +113,12 @@ Prioritas: **W** = wajib untuk ETS, **P** = penting. Kolom terakhir menunjukkan 
 
 | ID | Kebutuhan | Prioritas | Implementasi |
 |---|---|---|---|
-| F-10 | Membuat rekrutmen: jenis kegiatan (lomba/riset/projek), nama kegiatan, posisi, deskripsi, kriteria, keahlian, kuota, batas pendaftaran, tanggal mulai dan selesai, fee opsional, kontak. | W | `RekrutmenFormViewModel`, `RekrutmenService.CreateAsync` |
+| F-10 | Membuat rekrutmen: jenis kegiatan (lomba/riset/projek), nama kegiatan, posisi, deskripsi, kriteria, keahlian, kuota, batas pendaftaran, tanggal mulai dan selesai, fee opsional, link detail opsional (guidebook atau halaman resmi, harus URL http/https), kontak. | W | `RekrutmenFormViewModel`, `RekrutmenService.CreateAsync` |
 | F-11 | Validasi: batas pendaftaran tidak di masa lalu, mulai ≥ batas, selesai ≥ mulai, kuota 1 sampai 20, minimal satu keahlian. | W | `RekrutmenService.Validate` |
 | F-12 | Pembuat rekrutmen otomatis menjadi ketua tim (anggota ke-1), seperti di etc-be. | W | `RekrutmenService.CreateAsync` |
 | F-13 | Pembuat bisa mengubah, menutup, membuka kembali, dan menghapus rekrutmennya. Hapus meminta konfirmasi. Kuota tidak bisa diturunkan di bawah jumlah anggota yang sudah diterima. | W | `MyRekrutmenViewModel` |
 | F-14 | Jelajahi: cari berdasarkan posisi, nama kegiatan, keahlian, atau nama pembuat; filter jenis kegiatan; urutkan (terbaru, tenggat terdekat, sisa kuota terbanyak); tampilkan hanya yang masih dibuka; paginasi 12 per halaman. | W | `ExploreViewModel`, `RekrutmenService.SearchAsync` |
-| F-15 | Detail rekrutmen: batas pendaftaran, periode, kuota terisi, fee, deskripsi, kriteria, keahlian yang cocok dengan profil, dan reputasi pembuat. | W | `RekrutmenDetailView` |
+| F-15 | Detail rekrutmen: batas pendaftaran, periode, kuota terisi, fee, deskripsi, kriteria, keahlian yang cocok dengan profil, reputasi pembuat, dan tombol Info lengkap bila ada link detail. | W | `RekrutmenDetailView` |
 | F-16 | Simpan dan lepas simpan rekrutmen; halaman Tersimpan diurutkan dari tenggat terdekat. | W | `RekrutmenService.ToggleBookmarkAsync` |
 
 ### 6.3 Lamaran dan tim
@@ -127,14 +131,27 @@ Prioritas: **W** = wajib untuk ETS, **P** = penting. Kolom terakhir menunjukkan 
 | F-23 | Perekrut melihat pelamar beserta keahlian yang cocok, reputasi (rating, jumlah kegiatan selesai), tiga ulasan terbaru, alasan, tautan CV/portofolio, dan kontak WhatsApp. | W | `MyRekrutmenView` |
 | F-24 | Perekrut menerima atau menolak pelamar. Pelamar yang diterima langsung masuk tim. Saat kuota penuh, pendaftaran ditutup otomatis dan pelamar berikutnya tidak bisa diterima. | W | `PendaftarService.DecideAsync` |
 | F-25 | Tim saya: daftar tim beserta status kegiatan (belum mulai, berjalan, selesai), anggota, peran, keahlian, dan tombol WhatsApp. | W | `TeamsViewModel` |
+| F-27 | Formulir lamaran mengisi tautan portofolio dari profil bila sudah ada. | P | `ApplySheetViewModel` |
 | F-26 | Setelah kegiatan selesai, anggota memberi rating 1 sampai 5 dan ulasan (minimal 10 karakter) ke rekan satu tim, satu kali per rekan per tim. | P | `TimService.RateAsync` |
 
-### 6.4 Dashboard (Ringkasan)
+### 6.4 Mentor
+
+| ID | Kebutuhan | Prioritas | Implementasi |
+|---|---|---|---|
+| F-30 | Halaman Mentor menampilkan kartu mentor: foto (atau inisial), nama, dosen/mahasiswa dan angkatan, rating, jumlah bimbingan diterima, keahlian, pengalaman dan prestasi, serta tautan LinkedIn/portofolio. Dosen ditampilkan lebih dulu. | W | `MentorView`, `MentorService.ListAsync` |
+| F-31 | Cari mentor berdasarkan nama, keahlian, atau isi pengalaman; filter Semua/Dosen/Mahasiswa. | W | `MentorViewModel` |
+| F-32 | Tombol "Butuh mentor?" membuka formulir: pilih mentor, jenis kegiatan, topik (5 sampai 120 karakter), dan kebutuhan (20 sampai 800 karakter). Tombol "Minta bimbingan" di kartu membuka formulir yang sama dengan mentor terpilih. | W | `MentorRequestSheetViewModel`, `MentorService.Validate` |
+| F-33 | Tidak bisa meminta bimbingan ke diri sendiri, ke pengguna yang bukan mentor, atau mengirim permintaan kedua ke mentor yang sama selama yang pertama belum dijawab. | W | `MentorService.RequestAsync` |
+| F-34 | Permintaan saya: status (menunggu, diterima, ditolak); permintaan yang menunggu bisa dibatalkan lewat konfirmasi; bila diterima, tombol Hubungi membuka WhatsApp mentor. | W | `MentorViewModel` |
+| F-35 | Pengguna menjadi mentor dengan menyalakan "Jadi mentor" di Profil; syaratnya minimal satu keahlian dan pengalaman terisi. Mentor mendapat tab Permintaan masuk untuk menerima atau menolak, dan badge di sidebar untuk permintaan yang menunggu. | W | `AuthService.ValidateProfile`, `MentorService.DecideAsync` |
+
+### 6.5 Dashboard (Ringkasan)
 
 Dashboard adalah halaman pertama setelah masuk. Pertanyaan yang dijawabnya: **"Apa yang perlu saya putuskan atau lamar hari ini?"** Karena itu urutannya adalah keputusan dulu, baru tren.
 
 | ID | Bagian | Pertanyaan yang dijawab | Data |
 |---|---|---|---|
+| D-00 | Lengkapi profil Anda (onboarding) | Apa yang kurang dari profil saya? | Daftar langkah: foto, angkatan (mahasiswa), minimal tiga keahlian, pengalaman, tautan LinkedIn atau portofolio, beserta progres. Kartu hilang setelah semua langkah selesai. |
 | D-01 | Kalimat ringkas di bawah sapaan | Ada yang menunggu saya? | Jumlah pelamar menunggu (diberi penanda emas) dan jumlah rekomendasi. |
 | D-02 | Perlu keputusan Anda | Siapa yang menunggu keputusan, dan seberapa cocok? | Lima pelamar terlama, kecocokan keahlian, tombol Terima/Tolak langsung. |
 | D-03 | Posisi Anda | Bagaimana posisi saya saat ini? | Lamaran menunggu, tim aktif, rating dari rekan tim, rekrutmen terbuka. Setiap baris membuka halaman terkait. |
@@ -200,7 +217,7 @@ Material Symbols Rounded versi isi (*filled*), karena bentuknya dekat dengan SF 
 
 | Shortcut | Aksi |
 |---|---|
-| Ctrl+1 sampai Ctrl+6 | Ringkasan, Jelajahi, Tersimpan, Rekrutmen saya, Lamaran saya, Tim saya |
+| Ctrl+1 sampai Ctrl+7 | Ringkasan, Jelajahi, Tersimpan, Rekrutmen saya, Lamaran saya, Tim saya, Mentor |
 | Ctrl+, | Profil |
 | Ctrl+N | Buka rekrutmen baru |
 | Ctrl+F | Cari (di Jelajahi dan Tersimpan) |
@@ -222,6 +239,10 @@ Material Symbols Rounded versi isi (*filled*), karena bentuknya dekat dengan SF 
 | Masuk | Buka rekrutmen |
 |---|---|
 | ![Masuk](screenshots/light-auth.png) | ![Form](screenshots/light-sheet-form.png) |
+
+| Mentor | Mentor (gelap) |
+|---|---|
+| ![Mentor](screenshots/light-Mentor.png) | ![Mentor gelap](screenshots/dark-Mentor.png) |
 
 | Lamaran saya | Tim saya (gelap) | Profil (gelap) |
 |---|---|---|
@@ -279,6 +300,8 @@ erDiagram
     REKRUTMEN ||--|| TIM : membentuk
     TIM ||--o{ TIM_PARTICIPANT : beranggota
     TIM ||--o{ HISTORY : konteks_ulasan
+    USER ||--o{ MENTOR_REQUEST : meminta_bimbingan
+    USER ||--o{ MENTOR_REQUEST : membimbing
 
     USER {
         guid user_id PK
@@ -290,6 +313,12 @@ erDiagram
         string password_hash
         string bio "*"
         json spesialisasi
+        int angkatan "*"
+        string pengalaman "*"
+        string linkedin_url "*"
+        string portofolio_url "*"
+        string foto_path "*"
+        bool is_mentor "*"
     }
     REKRUTMEN {
         guid rekrutmen_id PK
@@ -306,6 +335,7 @@ erDiagram
         date tanggal_selesai
         decimal fee
         string contact_person
+        string link_detail "*"
         bool is_open "*"
     }
     PENDAFTAR {
@@ -342,7 +372,19 @@ erDiagram
         guid rekrutmen_id FK
         guid user_id FK
     }
+    MENTOR_REQUEST {
+        guid id PK "*"
+        guid mentor_id FK
+        guid user_id FK "yang meminta"
+        string kegiatan
+        string topik
+        string pesan
+        string status "Pending, Accepted, Rejected"
+        datetime decided_at
+    }
 ```
+
+Database dari versi sebelumnya tidak perlu dihapus: saat aplikasi dibuka, `SchemaUpgrade` menambahkan kolom dan tabel baru, lalu `Seeder` mengisi data mentor demo bila akun demo ada.
 
 ### 9.3 Pemetaan ke etc-be
 
@@ -361,11 +403,12 @@ erDiagram
 Saat pertama dijalankan, aplikasi mengisi database dengan 35 dosen Departemen Teknik Informatika ITS dan 30 mahasiswa. Rekrutmen (kriteria dan posisi dari `etc-be/migrations/script/seed.sql`) dibuat oleh dosen dari rumpun yang sesuai topiknya, misalnya computer vision oleh rumpun KCV dan CTF oleh rumpun KBJ.
 
 - **Dosen:** dikelompokkan per rumpun (RPL, KBJ, KCV, AJK, IGS, AP, MI, DTK); rumpun tampil di bio. NIP asli dipakai bila tersedia (misalnya Prof. Ir. Ary Mazharuddin Shiddiqi, 19810620 200501 1 003). Dosen lain memakai ID `DEMO-<rumpun>-<nomor>` agar tidak menyerupai NIP asli.
-- **Mahasiswa:** tiga anggota Tim 3 memakai NRP asli (Hosea Felix Sanjaya 5025241177, Muhammad Abid Baihaqi Al Faridzi 5025241133, Lyonel Oliver Dwiputra 5025241145). Akun Hosea memiliki riwayat paling lengkap. Mahasiswa lain adalah nama fiktif dengan NRP berformat asli: Teknik Informatika 5025 (angkatan 23 sampai 26), Rekayasa Perangkat Lunak 5053 dan Rekayasa Kecerdasan Artifisial 5054 (angkatan 26 sampai 23). Data mahasiswa asli tidak dipakai, karena aplikasi ini membuat lamaran, keputusan, dan ulasan karangan atas nama mereka.
+- **Mahasiswa:** tiga anggota Tim 3 memakai NRP asli (Hosea Felix Sanjaya 5025241177, Muhammad Abid Baihaqi Al Faridzi 5025241133, Lyonel Oliver Dwiputra 5025241145). Akun Hosea memiliki riwayat paling lengkap. Mahasiswa lain adalah 81 mahasiswa Teknik Informatika (5025, angkatan 23 sampai 26) dengan nama dan NRP asli dari daftar mahasiswa departemen. Lamaran, keputusan, ulasan, dan prestasi mentor atas nama mereka adalah data karangan untuk demo.
+- **Mentor:** satu dosen per rumpun (dosen dengan NIP asli didahulukan, sehingga akun demo Prof. Ary dan Henning menjadi mentor). Keahliannya adalah bidang rumpun dan pengalamannya hanya keterangan rumpun; prestasi dosen tidak dikarang. Empat mahasiswa fiktif angkatan 2023 menjadi mentor dengan prestasi karangan. Akun Hosea punya dua permintaan bimbingan (diterima dan menunggu), dan Prof. Ary punya dua permintaan masuk yang menunggu.
 
 ## 10. Kriteria penerimaan dan pengujian
 
-Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet test`. Hasil saat dokumen ini ditulis: **41 dari 41 lulus**.
+Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet test`. Hasil saat dokumen ini ditulis: **51 dari 51 lulus**.
 
 **Test service** (logika bisnis, database SQLite sementara per test):
 
@@ -375,6 +418,7 @@ Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet te
 | Validasi urutan tanggal, kuota, keahlian; pembuat jadi ketua tim; pencarian dan filter; bookmark; hanya pemilik bisa menghapus | `RekrutmenTests` |
 | Alur lamar → terima → masuk tim → kuota penuh → pendaftaran tertutup; tidak bisa melamar sendiri, tertutup, atau dua kali; tautan CV wajib URL; hanya lamaran menunggu yang bisa dibatalkan | `LamaranTests` |
 | Ulasan hanya untuk rekan tim dan sekali; angka dashboard sama dengan hitungan langsung di database | `TimDanDashboardTests` |
+| Angkatan dari NRP; validasi tautan profil dan angkatan; syarat mode mentor; foto profil disalin dan formatnya dicek; link detail rekrutmen; daftar dan pencarian mentor; alur minta bimbingan → mentor menerima; database versi lama ditingkatkan tanpa kehilangan data | `ProfilDanMentorTests` |
 
 **Test UI headless** (klik dan tombol keyboard sungguhan pada jendela aplikasi):
 
@@ -382,7 +426,7 @@ Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet te
 |---|---|
 | Masuk kosong menampilkan pesan; tombol akun demo mengisi formulir dan masuk | `Login_salah_menampilkan_pesan_lalu_akun_demo_berhasil` |
 | Onboarding memvalidasi langkah 1 dan bisa kembali ke layar masuk | `Onboarding_tiga_langkah_memvalidasi_tiap_langkah` |
-| Ketujuh item sidebar membuka halamannya | `Setiap_item_sidebar_membuka_halamannya` |
+| Kedelapan item sidebar membuka halamannya | `Setiap_item_sidebar_membuka_halamannya` |
 | Ctrl+N membuka formulir, formulir kosong ditolak, Escape menutup | `Ctrl_N_membuka_formulir_dan_Escape_menutupnya` |
 | Membuat rekrutmen lengkap lalu langsung terpilih di Rekrutmen saya | `Membuat_rekrutmen_lengkap_lalu_tampil_di_Rekrutmen_saya` |
 | Melamar dari Jelajahi (termasuk validasi tautan) sampai muncul di Lamaran saya | `Melamar_dari_Jelajahi_sampai_muncul_di_Lamaran_saya` |
@@ -394,6 +438,8 @@ Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet te
 | Hapus rekrutmen meminta konfirmasi, Batal tidak menghapus | `Hapus_rekrutmen_meminta_konfirmasi_dan_Batal_tidak_menghapus` |
 | Simpan profil memvalidasi nomor, lalu keluar kembali ke layar masuk | `Simpan_profil_memvalidasi_nomor_lalu_keluar` |
 | Mode gelap dari Profil mengubah tema | `Mode_gelap_dari_Profil_mengubah_tema` |
+| Kartu onboarding tampil di Ringkasan dan tombolnya membuka Profil | `Ringkasan_menampilkan_langkah_onboarding_profil` |
+| "Butuh mentor?" membuka formulir, memvalidasi pilihan mentor, lalu permintaan muncul di Permintaan saya | `Butuh_mentor_membuka_form_dan_mengirim_permintaan` |
 
 Dua bug yang ditemukan oleh test ini dan sudah diperbaiki: shortcut keyboard tidak aktif tepat setelah masuk (fokus hilang bersama layar masuk), dan tombol "Hapus semua filter" tertutup oleh daftar kosong yang transparan.
 

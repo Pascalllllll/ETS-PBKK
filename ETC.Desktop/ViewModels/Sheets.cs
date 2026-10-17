@@ -5,7 +5,7 @@ using ETC.Desktop.Services;
 
 namespace ETC.Desktop.ViewModels;
 
-public partial class ApplySheetViewModel(ShellViewModel shell, PendaftarService pendaftar, RekrutmenSummary rekrutmen, Action onDone)
+public partial class ApplySheetViewModel(ShellViewModel shell, PendaftarService pendaftar, Session session, RekrutmenSummary rekrutmen, Action onDone)
     : SheetViewModel
 {
     public string Title => $"Lamar sebagai {rekrutmen.Role}";
@@ -13,7 +13,7 @@ public partial class ApplySheetViewModel(ShellViewModel shell, PendaftarService 
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(AlasanCount))] private string _alasan = "";
     [ObservableProperty] private string _cvUrl = "";
-    [ObservableProperty] private string _portofolioUrl = "";
+    [ObservableProperty] private string _portofolioUrl = session.CurrentUser?.PortofolioUrl ?? "";
     public string AlasanCount => $"{Alasan.Length}/500";
 
     [RelayCommand]
@@ -100,6 +100,7 @@ public partial class RekrutmenFormViewModel : SheetViewModel
     [ObservableProperty] private DateTime? _selesai = DateTime.Today.AddDays(111);
     [ObservableProperty] private string _fee = "";
     [ObservableProperty] private string _contact = "";
+    [ObservableProperty] private string _linkDetail = "";
     public TagListViewModel Skills { get; } = new();
 
     public bool IsLomba { get => Kegiatan == Kegiatan.Lomba; set { if (value) Kegiatan = Kegiatan.Lomba; } }
@@ -136,6 +137,7 @@ public partial class RekrutmenFormViewModel : SheetViewModel
         Selesai = r.TanggalSelesai;
         Fee = r.Fee is { } f and > 0 ? f.ToString("0") : "";
         Contact = r.ContactPerson;
+        LinkDetail = r.LinkDetail ?? "";
         foreach (var s in r.Skills) Skills.Items.Add(s);
     }
 
@@ -152,7 +154,7 @@ public partial class RekrutmenFormViewModel : SheetViewModel
         if (Batas is null || Mulai is null || Selesai is null) { Error = "Lengkapi semua tanggal."; return; }
 
         var input = new RekrutmenInput(Kegiatan, Judul, Role, Deskripsi, Kriteria, Skills.Items.ToList(),
-            (int)(Kuota ?? 0), Batas.Value, Mulai.Value, Selesai.Value, fee, Contact);
+            (int)(Kuota ?? 0), Batas.Value, Mulai.Value, Selesai.Value, fee, Contact, LinkDetail);
         Error = RekrutmenService.Validate(input);
         if (Error is not null) return;
 

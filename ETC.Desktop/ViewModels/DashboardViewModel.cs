@@ -23,6 +23,8 @@ public class RecommendationRow(Recommendation r)
         r.Rekrutmen.Skills.Select(s => new SkillChip(s, r.SkillCocok.Contains(s))).ToList();
 }
 
+public record OnboardingStep(string Label, string Hint, bool Done);
+
 public partial class DashboardViewModel : ViewModelBase
 {
     private readonly ShellViewModel _shell;
@@ -49,7 +51,31 @@ public partial class DashboardViewModel : ViewModelBase
         _pendaftar = pendaftar;
         _session = session;
         Greeting = $"{Format.Greeting(DateTime.Now)}, {Format.FirstName(session.CurrentUser?.Nama ?? "")}";
+        Onboarding = OnboardingFor(session.CurrentUser);
         _ = LoadAsync();
+    }
+
+    public IReadOnlyList<OnboardingStep> Onboarding { get; }
+    public int OnboardingDone => Onboarding.Count(o => o.Done);
+    public bool ShowOnboarding => OnboardingDone < Onboarding.Count;
+    public string OnboardingText => $"{OnboardingDone} dari {Onboarding.Count} langkah selesai";
+    public double OnboardingProgress => 100.0 * OnboardingDone / Onboarding.Count;
+
+    // Profil lengkap membuat rekomendasi lebih tepat dan meyakinkan perekrut saat meninjau lamaran.
+    public static IReadOnlyList<OnboardingStep> OnboardingFor(Models.User? u)
+    {
+        if (u is null) return [];
+        var steps = new List<OnboardingStep>
+        {
+            new("Tambahkan foto profil", "Perekrut dan mentor lebih mudah mengenali Anda.", u.FotoPath is not null),
+            new("Isi minimal tiga keahlian", "Dipakai untuk rekomendasi rekrutmen yang cocok.", u.Spesialisasi.Count >= 3),
+            new("Tulis pengalaman atau prestasi", "Lomba, riset, magang, atau projek yang pernah diikuti.", !string.IsNullOrWhiteSpace(u.Pengalaman)),
+            new("Tautkan LinkedIn atau portofolio", "Perekrut bisa melihat hasil kerja Anda sebelum memutuskan.",
+                u.LinkedInUrl is not null || u.PortofolioUrl is not null),
+        };
+        if (u.Role == Models.UserRole.Mahasiswa)
+            steps.Insert(1, new("Isi angkatan", "Membantu tim menyusun anggota lintas angkatan.", u.Angkatan is not null));
+        return steps;
     }
 
     public string HeadlineA => Data is { PelamarMenunggu: > 0 } d ? $"\u2009{d.PelamarMenunggu} pelamar\u2009" : "";

@@ -20,7 +20,7 @@ internal static class Snapshot
         var dir = Dir!;
         Directory.CreateDirectory(dir);
         var user = Environment.GetEnvironmentVariable("ETC_SNAPSHOT_USER") ?? "5025241177";
-        var pages = (Environment.GetEnvironmentVariable("ETC_SNAPSHOT_PAGES") ?? "auth,Ringkasan,Jelajahi,Tersimpan,RekrutmenSaya,LamaranSaya,TimSaya,Profil")
+        var pages = (Environment.GetEnvironmentVariable("ETC_SNAPSHOT_PAGES") ?? "auth,Ringkasan,Jelajahi,Tersimpan,RekrutmenSaya,LamaranSaya,TimSaya,Mentor,Profil")
             .Split(',', StringSplitOptions.RemoveEmptyEntries);
         var themes = (Environment.GetEnvironmentVariable("ETC_SNAPSHOT_THEMES") ?? "light,dark").Split(',');
 

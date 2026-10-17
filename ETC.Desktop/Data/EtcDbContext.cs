@@ -14,6 +14,7 @@ public class EtcDbContext(DbContextOptions<EtcDbContext> options) : DbContext(op
     public DbSet<TimParticipant> TimParticipants => Set<TimParticipant>();
     public DbSet<History> Histories => Set<History>();
     public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
+    public DbSet<MentorRequest> MentorRequests => Set<MentorRequest>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -86,6 +87,15 @@ public class EtcDbContext(DbContextOptions<EtcDbContext> options) : DbContext(op
             e.HasOne(x => x.Rekrutmen).WithMany(r => r.Bookmarks).HasForeignKey(x => x.RekrutmenId)
                 .OnDelete(DeleteBehavior.Cascade);
             e.HasOne(x => x.User).WithMany(u => u.Bookmarks).HasForeignKey(x => x.UserId);
+        });
+
+        b.Entity<MentorRequest>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Kegiatan).HasConversion<string>();
+            e.Property(x => x.Status).HasConversion<string>();
+            e.HasOne(x => x.Mentor).WithMany().HasForeignKey(x => x.MentorId);
+            e.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
         });
     }
 }

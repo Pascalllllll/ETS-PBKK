@@ -68,6 +68,11 @@
           </StackPanel>
         </Grid>
         <StackPanel>
+          <TextBlock Classes="field" Text="Link detail (opsional)" />
+          <TextBox Text="{Binding LinkDetail}" Watermark="https://halaman-resmi-lomba.id" />
+          <TextBlock Classes="hint" Text="Guidebook, halaman resmi lomba, atau dokumen proposal projek." />
+        </StackPanel>
+        <StackPanel>
           <TextBlock Classes="field" Text="Kontak" />
           <TextBox Text="{Binding Contact}" />
           <TextBlock Classes="hint" Text="Diisi otomatis dari nomor WhatsApp di profil Anda." />
