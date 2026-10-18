@@ -39,7 +39,7 @@
                 <TextBox Text="{Binding NoTelp}" />
               </StackPanel>
             </Grid>
-            <StackPanel IsVisible="{Binding IsMahasiswa}">
+            <StackPanel>
               <TextBlock Classes="field" Text="Angkatan" />
               <NumericUpDown Value="{Binding Angkatan}" Minimum="2000" Maximum="{Binding MaxAngkatan}" Increment="1" FormatString="0"
                              Width="160" HorizontalAlignment="Left" AutomationProperties.Name="Angkatan" />

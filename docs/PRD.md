@@ -1,6 +1,6 @@
 # Product Requirement Document: ETC Desktop
 
-**Judul studi kasus:** ETC (Elite TC Champions), aplikasi desktop untuk mencari dan membentuk tim lomba, riset, dan projek bagi mahasiswa dan dosen ITS.
+**Judul studi kasus:** ETC (Elite TC Champions), aplikasi desktop untuk mencari dan membentuk tim lomba, riset, dan projek antarmahasiswa ITS.
 
 | | |
 |---|---|
@@ -9,7 +9,7 @@
 | Platform | Aplikasi desktop (Windows, Linux, macOS) |
 | Bahasa dan kerangka kerja | C# (.NET 8), Avalonia UI 11, Entity Framework Core 8 (SQLite), CommunityToolkit.Mvvm |
 | Referensi | Pitch deck *Elite TC Champions*, repositori [etc-be](https://github.com/Arthamna/etc-be) (Go) dan [etc-fe](https://github.com/Arthamna/etc-fe) (Next.js) |
-| Status dokumen | Versi 1.1, sesuai implementasi di folder `ETC.Desktop` (menambah halaman Mentor, profil lengkap, dan onboarding di Ringkasan) |
+| Status dokumen | Versi 1.2, sesuai implementasi di folder `ETC.Desktop` (pengguna hanya mahasiswa; peran dosen dihapus) |
 
 ---
 
@@ -18,7 +18,7 @@
 Survei di Departemen Teknik Informatika ITS (lihat pitch deck, slide 01) menunjukkan kebutuhan mencari teman untuk lomba, riset, dan projek. Masalah yang ditemukan:
 
 1. **Informasi tersebar.** Rekrutmen lomba dan riset diumumkan di grup WhatsApp dan Telegram yang berbeda-beda, sehingga mudah terlewat.
-2. **Kurang pembimbing.** Mahasiswa kesulitan menemukan dosen atau mentor yang sedang membuka kesempatan.
+2. **Kurang pembimbing.** Mahasiswa kesulitan menemukan kakak tingkat berpengalaman yang mau membimbing.
 3. **Sulit mencari partner lintas jurusan.** Tidak ada tempat untuk mencari orang berdasarkan keahlian tertentu (Backend, UI/UX, dan lain-lain).
 4. **Tidak ada penilaian.** Perekrut tidak bisa menilai kualitas calon anggota sebelum menerimanya, karena belum ada fitur rating dan ulasan.
 
@@ -26,14 +26,14 @@ ETC versi web sudah dibuat sebelumnya (etc-be + etc-fe). Dokumen ini menjelaskan
 
 ## 2. Tujuan
 
-Membangun platform terpusat yang menghubungkan mahasiswa dan dosen dalam mencari partner untuk lomba, riset, dan projek. Empat masalah dari pitch deck menjadi tujuan produk:
+Membangun platform terpusat tempat mahasiswa mencari sesama mahasiswa dengan minat yang sama sebagai partner lomba, riset, dan projek. Empat masalah dari pitch deck menjadi tujuan produk:
 
 | Tujuan | Cara ETC Desktop menjawabnya |
 |---|---|
 | Mengatasi *information gap* | Semua rekrutmen ada di satu daftar yang bisa dicari, difilter, dan disimpan. |
 | Mengatasi *department gap* | Pencarian berdasarkan keahlian, bukan jurusan; rekomendasi lintas jurusan di Ringkasan. |
 | Mengatasi *skill matching problem* | Setiap rekrutmen mencantumkan keahlian yang dicari; aplikasi menandai keahlian yang cocok, baik di sisi pelamar maupun perekrut. |
-| Mengatasi *kurang pembimbing* | Halaman Mentor berisi dosen dan mahasiswa senior beserta keahlian dan prestasinya; tombol "Butuh mentor?" membuka formulir permintaan bimbingan. |
+| Mengatasi *kurang pembimbing* | Halaman Mentor berisi kakak tingkat beserta keahlian dan prestasinya; tombol "Butuh mentor?" membuka formulir permintaan bimbingan. |
 | Mengatasi *trust barrier* | Rating dan ulasan antar-rekan tim setelah kegiatan selesai, ditampilkan saat perekrut meninjau pelamar. |
 
 ## 3. Ruang lingkup
@@ -58,6 +58,7 @@ Membangun platform terpusat yang menghubungkan mahasiswa dan dosen dalam mencari
 - Unggah berkas CV ke Google Drive (etc-be memakai Drive; versi desktop memakai tautan).
 - Notifikasi push dan chat di dalam aplikasi. Kontak dilakukan lewat WhatsApp.
 - Peran admin.
+- Akun dosen. ETC hanya untuk mahasiswa; dosen tidak membuat rekrutmen atau membimbing lewat aplikasi.
 
 ## 4. Pengguna dan aktor
 
@@ -66,10 +67,9 @@ Aktor dan aksi diambil dari pitch deck (slide 06).
 | Aktor | Kebutuhan utama | Aksi di aplikasi |
 |---|---|---|
 | **Mahasiswa** | Menemukan tim lomba, posisi asisten riset, atau projek yang sesuai keahlian; juga merekrut teman untuk lomba. | Mendaftar rekrutmen, mencari rekrutmen, membuat rekrutmen, melihat riwayat pendaftar rekrutmen, memberi ulasan rekan tim. |
-| **Dosen** | Merekrut asisten riset atau anggota projek yang bisa dipercaya. | Membuat rekrutmen, melihat riwayat pendaftar rekrutmen, mencari rekrutmen, memberi ulasan anggota tim, menjawab permintaan bimbingan. |
-| **Mentor** | Dosen atau mahasiswa senior yang mau membimbing tim lomba, riset, atau projek. | Mengaktifkan mode mentor di Profil, lalu menerima atau menolak permintaan bimbingan. |
+| **Mentor** | Mahasiswa senior yang mau membimbing tim lomba, riset, atau projek. | Mengaktifkan mode mentor di Profil, lalu menerima atau menolak permintaan bimbingan. |
 
-Kedua aktor memakai fitur yang sama; perbedaannya ada pada identitas (NRP untuk mahasiswa, NIP untuk dosen) dan konteks pemakaian.
+Semua pengguna adalah mahasiswa dan masuk dengan NRP. Mentor bukan akun terpisah, melainkan mahasiswa yang mengaktifkan mode mentor.
 
 ## 5. Proses bisnis
 
@@ -101,10 +101,10 @@ Prioritas: **W** = wajib untuk ETS, **P** = penting. Kolom terakhir menunjukkan 
 
 | ID | Kebutuhan | Prioritas | Implementasi |
 |---|---|---|---|
-| F-01 | Pengguna masuk dengan NRP/NIP dan kata sandi. Pesan salah tidak membedakan "akun tidak ada" dan "kata sandi salah". | W | `AuthService.LoginAsync` |
-| F-02 | Daftar akun dalam tiga langkah: (1) peran, nama, NRP/NIP; (2) departemen, nomor WhatsApp; (3) keahlian, kata sandi. Setiap langkah divalidasi sebelum lanjut. | W | `AuthViewModel`, `AuthView` |
-| F-03 | NRP/NIP unik. NRP 10 digit (format 5025241XXX); NIP 18 digit, disimpan dengan pengelompokan baku (19810620 200501 1 003) sehingga bisa diketik dengan atau tanpa spasi. Kata sandi minimal 8 karakter dan disimpan sebagai hash bcrypt. | W | `AuthService.RegisterAsync`, `NormalizeNoPengenal` |
-| F-04 | Pengguna mengubah nama, departemen, nomor WhatsApp, bio, keahlian, angkatan (mahasiswa), pengalaman dan prestasi (maksimal 1000 karakter, satu per baris), serta tautan LinkedIn dan portofolio (opsional, harus URL http/https). Angkatan diisi otomatis dari NRP saat mendaftar (5025**24**1177 → 2024). | W | `ProfileViewModel`, `AuthService.ValidateProfile` |
+| F-01 | Pengguna masuk dengan NRP dan kata sandi. Pesan salah tidak membedakan "akun tidak ada" dan "kata sandi salah". | W | `AuthService.LoginAsync` |
+| F-02 | Daftar akun dalam tiga langkah: (1) nama dan NRP; (2) departemen, nomor WhatsApp; (3) keahlian, kata sandi. Setiap langkah divalidasi sebelum lanjut. | W | `AuthViewModel`, `AuthView` |
+| F-03 | NRP unik dan terdiri dari 10 digit (format 5025241XXX). Kata sandi minimal 8 karakter dan disimpan sebagai hash bcrypt. | W | `AuthService.RegisterAsync`, `ValidateIdentity` |
+| F-04 | Pengguna mengubah nama, departemen, nomor WhatsApp, bio, keahlian, angkatan, pengalaman dan prestasi (maksimal 1000 karakter, satu per baris), serta tautan LinkedIn dan portofolio (opsional, harus URL http/https). Angkatan diisi otomatis dari NRP saat mendaftar (5025**24**1177 → 2024). | W | `ProfileViewModel`, `AuthService.ValidateProfile` |
 | F-07 | Pengguna mengganti atau menghapus foto profil (JPG, PNG, WebP, maksimal 5 MB). Foto disalin ke folder data aplikasi dan dipakai di sidebar, profil, dan kartu mentor; tanpa foto, inisial nama ditampilkan. | P | `AuthService.SetFotoAsync`, `Controls/Avatar` |
 | F-05 | Profil menampilkan rata-rata rating dan daftar ulasan dari rekan tim. | P | `ProfileView` |
 | F-06 | Pengguna memilih mode tampilan: ikuti sistem, terang, atau gelap. | P | `AppSettings` |
@@ -138,8 +138,8 @@ Prioritas: **W** = wajib untuk ETS, **P** = penting. Kolom terakhir menunjukkan 
 
 | ID | Kebutuhan | Prioritas | Implementasi |
 |---|---|---|---|
-| F-30 | Halaman Mentor menampilkan kartu mentor: foto (atau inisial), nama, dosen/mahasiswa dan angkatan, rating, jumlah bimbingan diterima, keahlian, pengalaman dan prestasi, serta tautan LinkedIn/portofolio. Dosen ditampilkan lebih dulu. | W | `MentorView`, `MentorService.ListAsync` |
-| F-31 | Cari mentor berdasarkan nama, keahlian, atau isi pengalaman; filter Semua/Dosen/Mahasiswa. | W | `MentorViewModel` |
+| F-30 | Halaman Mentor menampilkan kartu mentor: foto (atau inisial), nama, departemen dan angkatan, rating, jumlah bimbingan diterima, keahlian, pengalaman dan prestasi, serta tautan LinkedIn/portofolio. Mentor dengan bimbingan diterima terbanyak ditampilkan lebih dulu. | W | `MentorView`, `MentorService.ListAsync` |
+| F-31 | Cari mentor berdasarkan nama, keahlian, atau isi pengalaman. | W | `MentorViewModel` |
 | F-32 | Tombol "Butuh mentor?" membuka formulir: pilih mentor, jenis kegiatan, topik (5 sampai 120 karakter), dan kebutuhan (20 sampai 800 karakter). Tombol "Minta bimbingan" di kartu membuka formulir yang sama dengan mentor terpilih. | W | `MentorRequestSheetViewModel`, `MentorService.Validate` |
 | F-33 | Tidak bisa meminta bimbingan ke diri sendiri, ke pengguna yang bukan mentor, atau mengirim permintaan kedua ke mentor yang sama selama yang pertama belum dijawab. | W | `MentorService.RequestAsync` |
 | F-34 | Permintaan saya: status (menunggu, diterima, ditolak); permintaan yang menunggu bisa dibatalkan lewat konfirmasi; bila diterima, tombol Hubungi membuka WhatsApp mentor. | W | `MentorViewModel` |
@@ -169,7 +169,7 @@ Semua angka dihitung dari database saat halaman dibuka (`DashboardService`). Tid
 |---|---|---|
 | N-01 | Keamanan kata sandi | Hash bcrypt (work factor 10); kata sandi tidak pernah disimpan atau ditampilkan. |
 | N-02 | Otorisasi | Hanya pembuat yang bisa mengubah atau menghapus rekrutmen dan memutuskan pelamar. Ulasan hanya untuk rekan satu tim. Diperiksa di layer service, bukan hanya di UI. |
-| N-03 | Integritas data | Indeks unik: NRP/NIP, satu lamaran per orang per rekrutmen, satu bookmark per orang per rekrutmen, satu ulasan per pasangan per tim. Hapus rekrutmen ikut menghapus lamaran, tim, dan ulasan terkait. |
+| N-03 | Integritas data | Indeks unik: NRP, satu lamaran per orang per rekrutmen, satu bookmark per orang per rekrutmen, satu ulasan per pasangan per tim. Hapus rekrutmen ikut menghapus lamaran, tim, dan ulasan terkait. |
 | N-04 | Bekerja tanpa internet | Data disimpan di SQLite lokal (`%LOCALAPPDATA%/ETC/etc.db` atau `~/.local/share/ETC/etc.db`). Internet hanya dipakai untuk membuka tautan. |
 | N-05 | Responsif | Semua akses database berjalan asinkron; UI tetap bisa dipakai saat data dimuat. Pencarian memakai jeda 250 ms supaya tidak memuat ulang di setiap ketikan. |
 | N-06 | Aksesibilitas | Kontras teks memenuhi WCAG AA (dihitung, lihat bagian 8.2). Status tidak pernah hanya ditandai warna. Semua kontrol bisa dipakai dengan keyboard dan punya cincin fokus terlihat. Tombol ikon punya nama untuk pembaca layar. Grafik punya ringkasan teks dan tampilan tabel. |
@@ -307,8 +307,7 @@ erDiagram
         guid user_id PK
         string nama
         string jurusan
-        string no_pengenal UK "NRP atau NIP"
-        string role "Mahasiswa atau Dosen"
+        string no_pengenal UK "NRP"
         string no_telp
         string password_hash
         string bio "*"
@@ -400,25 +399,24 @@ Database dari versi sebelumnya tidak perlu dihapus: saat aplikasi dibuka, `Schem
 
 ### 9.4 Data demo
 
-Saat pertama dijalankan, aplikasi mengisi database dengan 35 dosen Departemen Teknik Informatika ITS dan 30 mahasiswa. Rekrutmen (kriteria dan posisi dari `etc-be/migrations/script/seed.sql`) dibuat oleh dosen dari rumpun yang sesuai topiknya, misalnya computer vision oleh rumpun KCV dan CTF oleh rumpun KBJ.
+Saat pertama dijalankan, aplikasi mengisi database dengan 84 mahasiswa. Rekrutmen (kriteria dan posisi dari `etc-be/migrations/script/seed.sql`) dibuat oleh mahasiswa yang keahliannya paling cocok dengan topiknya, misalnya rekrutmen computer vision oleh mahasiswa dengan keahlian OpenCV. Database dari versi yang masih punya akun dosen dibuat ulang otomatis.
 
-- **Dosen:** dikelompokkan per rumpun (RPL, KBJ, KCV, AJK, IGS, AP, MI, DTK); rumpun tampil di bio. NIP asli dipakai bila tersedia (misalnya Prof. Ir. Ary Mazharuddin Shiddiqi, 19810620 200501 1 003). Dosen lain memakai ID `DEMO-<rumpun>-<nomor>` agar tidak menyerupai NIP asli.
 - **Mahasiswa:** tiga anggota Tim 3 memakai NRP asli (Hosea Felix Sanjaya 5025241177, Muhammad Abid Baihaqi Al Faridzi 5025241133, Lyonel Oliver Dwiputra 5025241145). Akun Hosea memiliki riwayat paling lengkap. Mahasiswa lain adalah 81 mahasiswa Teknik Informatika (5025, angkatan 23 sampai 26) dengan nama dan NRP asli dari daftar mahasiswa departemen. Lamaran, keputusan, ulasan, dan prestasi mentor atas nama mereka adalah data karangan untuk demo.
-- **Mentor:** satu dosen per rumpun (dosen dengan NIP asli didahulukan, sehingga akun demo Prof. Ary dan Henning menjadi mentor). Keahliannya adalah bidang rumpun dan pengalamannya hanya keterangan rumpun; prestasi dosen tidak dikarang. Empat mahasiswa fiktif angkatan 2023 menjadi mentor dengan prestasi karangan. Akun Hosea punya dua permintaan bimbingan (diterima dan menunggu), dan Prof. Ary punya dua permintaan masuk yang menunggu.
+- **Mentor:** delapan mahasiswa angkatan 2023 menjadi mentor dengan prestasi karangan. Akun Hosea punya dua permintaan bimbingan (diterima dan menunggu), dan Dimas Surya Pratama (5025231247) punya dua permintaan masuk yang menunggu.
 
 ## 10. Kriteria penerimaan dan pengujian
 
-Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet test`. Hasil saat dokumen ini ditulis: **51 dari 51 lulus**.
+Pengujian otomatis ada di proyek `ETC.Tests` (xUnit). Jalankan dengan `dotnet test`. Hasil saat dokumen ini ditulis: **50 dari 50 lulus**.
 
 **Test service** (logika bisnis, database SQLite sementara per test):
 
 | Kriteria | Test |
 |---|---|
-| Kata sandi salah ditolak; daftar langsung masuk; NRP ganda ditolak; format NRP, NIP, dan WhatsApp divalidasi; NIP bisa diketik tanpa spasi; gelar tidak masuk sapaan | `AuthTests` |
+| Kata sandi salah ditolak; daftar langsung masuk; NRP ganda ditolak; format NRP dan WhatsApp divalidasi; data demo hanya berisi mahasiswa; gelar tidak masuk sapaan | `AuthTests` |
 | Validasi urutan tanggal, kuota, keahlian; pembuat jadi ketua tim; pencarian dan filter; bookmark; hanya pemilik bisa menghapus | `RekrutmenTests` |
 | Alur lamar → terima → masuk tim → kuota penuh → pendaftaran tertutup; tidak bisa melamar sendiri, tertutup, atau dua kali; tautan CV wajib URL; hanya lamaran menunggu yang bisa dibatalkan | `LamaranTests` |
 | Ulasan hanya untuk rekan tim dan sekali; angka dashboard sama dengan hitungan langsung di database | `TimDanDashboardTests` |
-| Angkatan dari NRP; validasi tautan profil dan angkatan; syarat mode mentor; foto profil disalin dan formatnya dicek; link detail rekrutmen; daftar dan pencarian mentor; alur minta bimbingan → mentor menerima; database versi lama ditingkatkan tanpa kehilangan data | `ProfilDanMentorTests` |
+| Angkatan dari NRP; validasi tautan profil dan angkatan; syarat mode mentor; foto profil disalin dan formatnya dicek; link detail rekrutmen; daftar dan pencarian mentor; alur minta bimbingan → mentor menerima; database versi dengan dosen dibuat ulang | `ProfilDanMentorTests` |
 
 **Test UI headless** (klik dan tombol keyboard sungguhan pada jendela aplikasi):
 

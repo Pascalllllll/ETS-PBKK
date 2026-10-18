@@ -54,8 +54,6 @@ public static class Labels
         _ => "Menunggu",
     };
 
-    public static string Of(UserRole r) => r == UserRole.Dosen ? "Dosen" : "Mahasiswa";
-
     public static readonly string[] Jurusan =
     {
         "Teknik Informatika", "Rekayasa Perangkat Lunak", "Rekayasa Kecerdasan Artifisial", "Sistem Informasi",

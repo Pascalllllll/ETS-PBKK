@@ -73,8 +73,7 @@ public partial class DashboardViewModel : ViewModelBase
             new("Tautkan LinkedIn atau portofolio", "Perekrut bisa melihat hasil kerja Anda sebelum memutuskan.",
                 u.LinkedInUrl is not null || u.PortofolioUrl is not null),
         };
-        if (u.Role == Models.UserRole.Mahasiswa)
-            steps.Insert(1, new("Isi angkatan", "Membantu tim menyusun anggota lintas angkatan.", u.Angkatan is not null));
+        steps.Insert(1, new("Isi angkatan", "Membantu tim menyusun anggota lintas angkatan.", u.Angkatan is not null));
         return steps;
     }
 

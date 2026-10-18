@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ETC.Desktop.Data;
-using ETC.Desktop.Models;
 using ETC.Desktop.Services;
 
 namespace ETC.Desktop.ViewModels;
@@ -30,9 +29,6 @@ public partial class AuthViewModel(AuthService auth) : ViewModelBase
         _ => "Apa keahlian Anda?",
     };
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(NoPengenalLabel), nameof(NoPengenalFormat))] private bool _isDosen;
-    public string NoPengenalLabel => IsDosen ? "NIP" : "NRP";
-    public string NoPengenalFormat => IsDosen ? "18 digit, contoh 19810620 200501 1 003" : "10 digit, contoh 5025241XXX";
     [ObservableProperty] private string _nama = "";
     [ObservableProperty] private string _noPengenal = "";
     [ObservableProperty] private string? _jurusan;
@@ -55,9 +51,9 @@ public partial class AuthViewModel(AuthService auth) : ViewModelBase
     }
 
     [RelayCommand]
-    void FillDemo(string kind)
+    void FillDemo()
     {
-        LoginId = kind == "dosen" ? "19810620 200501 1 003" : "5025241177";
+        LoginId = "5025241177";
         LoginPassword = Seeder.DemoPassword;
         Error = null;
     }
@@ -73,7 +69,7 @@ public partial class AuthViewModel(AuthService auth) : ViewModelBase
     {
         Error = Step switch
         {
-            1 => AuthService.ValidateIdentity(Nama, IsDosen ? UserRole.Dosen : UserRole.Mahasiswa, NoPengenal),
+            1 => AuthService.ValidateIdentity(Nama, NoPengenal),
             2 => AuthService.ValidateContact(NoTelp),
             _ => null,
         };
@@ -94,8 +90,7 @@ public partial class AuthViewModel(AuthService auth) : ViewModelBase
         Error = AuthService.ValidatePassword(Password, ConfirmPassword);
         if (Error is not null) return;
         IsBusy = true;
-        var r = await auth.RegisterAsync(new RegisterRequest(Nama, IsDosen ? UserRole.Dosen : UserRole.Mahasiswa,
-            NoPengenal, Jurusan, NoTelp, Skills.Items.ToList(), Password, ConfirmPassword));
+        var r = await auth.RegisterAsync(new RegisterRequest(Nama, NoPengenal, Jurusan, NoTelp, Skills.Items.ToList(), Password, ConfirmPassword));
         IsBusy = false;
         if (!r.Ok) Error = r.Error;
     }

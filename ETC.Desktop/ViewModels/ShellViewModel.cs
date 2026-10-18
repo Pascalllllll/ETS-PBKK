@@ -29,7 +29,7 @@ public partial class ShellViewModel : ViewModelBase
 
     public string Nama => _session.CurrentUser?.Nama ?? "";
     public string? FotoPath => _session.CurrentUser?.FotoPath;
-    public string RoleText => _session.CurrentUser is { } u ? $"{Labels.Of(u.Role)} · {u.NoPengenal}" : "";
+    public string NrpText => _session.CurrentUser is { } u ? $"NRP {u.NoPengenal}" : "";
 
     public ShellViewModel(IServiceProvider sp, Session session, DashboardService dashboard)
     {
@@ -40,7 +40,7 @@ public partial class ShellViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(Nama));
             OnPropertyChanged(nameof(FotoPath));
-            OnPropertyChanged(nameof(RoleText));
+            OnPropertyChanged(nameof(NrpText));
         };
         // Page sudah Ringkasan sejak awal, jadi setter tidak terpicu.
         Load(Page.Ringkasan, null);

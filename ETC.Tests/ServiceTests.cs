@@ -16,7 +16,6 @@ public sealed class TestDb : IDisposable
     {
         Sp = App.BuildServices($"Data Source={_path};Pooling=False");
         using var db = Sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
-        db.Database.EnsureCreated();
         SchemaUpgrade.Apply(db);
         if (seed) Seeder.Seed(db);
     }
@@ -50,7 +49,7 @@ public class AuthTests
     {
         using var t = new TestDb(seed: false);
         var r = await t.Get<AuthService>().RegisterAsync(new RegisterRequest(
-            "Mahasiswa Baru", UserRole.Mahasiswa, "5025991234", "Teknik Informatika", "081211112222",
+            "Mahasiswa Baru", "5025991234", "Teknik Informatika", "081211112222",
             ["Go", "go", "Docker"], "rahasia123", "rahasia123"));
         Assert.True(r.Ok, r.Error);
         var user = t.Get<Session>().CurrentUser!;
@@ -63,7 +62,7 @@ public class AuthTests
     {
         using var t = new TestDb();
         var r = await t.Get<AuthService>().RegisterAsync(new RegisterRequest(
-            "Siapa Saja", UserRole.Mahasiswa, "5025241177", null, "081211112222", [], "rahasia123", "rahasia123"));
+            "Siapa Saja", "5025241177", null, "081211112222", [], "rahasia123", "rahasia123"));
         Assert.False(r.Ok);
         Assert.Contains("sudah terdaftar", r.Error);
     }
@@ -77,21 +76,21 @@ public class AuthTests
         Assert.Equal(valid, AuthService.ValidateContact(no) is null);
 
     [Theory]
-    [InlineData(UserRole.Mahasiswa, "5025241177", true)]
-    [InlineData(UserRole.Mahasiswa, "502524117", false)]
-    [InlineData(UserRole.Mahasiswa, "NIM2021001", false)]
-    [InlineData(UserRole.Dosen, "19810620 200501 1 003", true)]
-    [InlineData(UserRole.Dosen, "198106202005011003", true)]
-    [InlineData(UserRole.Dosen, "19810620 200501", false)]
-    public void Validasi_format_NRP_dan_NIP(UserRole role, string no, bool valid) =>
-        Assert.Equal(valid, AuthService.ValidateIdentity("Nama Lengkap", role, no) is null);
+    [InlineData("5025241177", true)]
+    [InlineData(" 5025241177 ", true)]
+    [InlineData("502524117", false)]
+    [InlineData("NIM2021001", false)]
+    [InlineData("5025 241177", false)]
+    public void Validasi_format_NRP(string no, bool valid) =>
+        Assert.Equal(valid, AuthService.ValidateIdentity("Nama Lengkap", no) is null);
 
     [Fact]
-    public async Task NIP_bisa_diketik_tanpa_spasi()
+    public void Data_demo_hanya_berisi_mahasiswa()
     {
         using var t = new TestDb();
-        Assert.True((await t.Get<AuthService>().LoginAsync("198106202005011003", Seeder.DemoPassword)).Ok);
-        Assert.StartsWith("Prof. Ir. Ary", t.Get<Session>().CurrentUser!.Nama);
+        using var db = t.Db();
+        Assert.All(db.Users.ToList(), u => Assert.Null(AuthService.ValidateIdentity(u.Nama, u.NoPengenal)));
+        Assert.All(db.Rekrutmens.Include(r => r.User).ToList(), r => Assert.NotNull(r.User.Angkatan));
     }
 
     [Fact]
@@ -178,22 +177,22 @@ public class LamaranTests
     {
         using var t = new TestDb(seed: false);
         var auth = t.Get<AuthService>();
-        await auth.RegisterAsync(new RegisterRequest("Ketua Tim", UserRole.Dosen, "19900101 201501 1 001", null, "081200000001", ["Go"], "rahasia123", "rahasia123"));
+        await auth.RegisterAsync(new RegisterRequest("Ketua Tim", "5025000009", null, "081200000001", ["Go"], "rahasia123", "rahasia123"));
         var rek = await t.Get<RekrutmenService>().CreateAsync(new RekrutmenInput(Kegiatan.Riset, "Riset", "Asisten", "d", "k", ["Go"], 1,
             DateTime.Today.AddDays(5), DateTime.Today.AddDays(6), DateTime.Today.AddDays(30), 100000, "wa.me/6281"));
         auth.Logout();
 
         var pendaftar = t.Get<PendaftarService>();
         var input = new ApplyInput("Saya tertarik", "https://drive.google.com/cv", "https://github.com/x");
-        await auth.RegisterAsync(new RegisterRequest("Mhs Satu", UserRole.Mahasiswa, "5025000001", null, "081200000002", ["Go"], "rahasia123", "rahasia123"));
+        await auth.RegisterAsync(new RegisterRequest("Mhs Satu", "5025000001", null, "081200000002", ["Go"], "rahasia123", "rahasia123"));
         Assert.True((await pendaftar.ApplyAsync(rek.Value, input)).Ok);
         Assert.False((await pendaftar.ApplyAsync(rek.Value, input)).Ok); // tidak boleh dua kali
         auth.Logout();
-        await auth.RegisterAsync(new RegisterRequest("Mhs Dua", UserRole.Mahasiswa, "5025000002", null, "081200000003", [], "rahasia123", "rahasia123"));
+        await auth.RegisterAsync(new RegisterRequest("Mhs Dua", "5025000002", null, "081200000003", [], "rahasia123", "rahasia123"));
         Assert.True((await pendaftar.ApplyAsync(rek.Value, input)).Ok);
         auth.Logout();
 
-        await auth.LoginAsync("199001012015011001", "rahasia123");
+        await auth.LoginAsync("5025000009", "rahasia123");
         var applicants = await pendaftar.ApplicantsAsync(rek.Value);
         Assert.Equal(2, applicants.Count);
         var satu = applicants.Single(a => a.Nama == "Mhs Satu");
@@ -294,7 +293,7 @@ public class ProfilDanMentorTests
     {
         using var t = new TestDb(seed: false);
         await t.Get<AuthService>().RegisterAsync(new RegisterRequest(
-            "Mahasiswa Baru", UserRole.Mahasiswa, "5025231234", null, "081211112222", ["Go"], "rahasia123", "rahasia123"));
+            "Mahasiswa Baru", "5025231234", null, "081211112222", ["Go"], "rahasia123", "rahasia123"));
         Assert.Equal(2023, t.Get<Session>().CurrentUser!.Angkatan);
     }
 
@@ -357,19 +356,18 @@ public class ProfilDanMentorTests
     }
 
     [Fact]
-    public async Task Daftar_mentor_berisi_dosen_dan_mahasiswa_dan_bisa_dicari()
+    public async Task Daftar_mentor_berisi_kakak_tingkat_dan_bisa_dicari()
     {
         using var t = new TestDb();
         await t.LoginAs("5025241177");
         var mentor = t.Get<MentorService>();
         var all = await mentor.ListAsync();
-        Assert.Contains(all, m => m.Role == UserRole.Dosen);
-        Assert.Contains(all, m => m.Role == UserRole.Mahasiswa && m.Pengalaman.Length > 0);
+        Assert.True(all.Count >= 8);
         Assert.All(all, m => Assert.NotEmpty(m.Skills));
+        Assert.All(all, m => Assert.NotEmpty(m.Pengalaman));
         var unity = await mentor.ListAsync("unity");
         Assert.NotEmpty(unity);
         Assert.All(unity, m => Assert.Contains(m.Skills, s => s.Contains("Unity")));
-        Assert.All(await mentor.ListAsync(role: UserRole.Mahasiswa), m => Assert.Equal(UserRole.Mahasiswa, m.Role));
     }
 
     [Fact]
@@ -378,8 +376,8 @@ public class ProfilDanMentorTests
         using var t = new TestDb();
         await t.LoginAs("5025241145");
         var svc = t.Get<MentorService>();
-        var ary = (await svc.ListAsync("Ary")).Single();
-        var input = new MentorRequestInput(ary.UserId, Kegiatan.Riset, "Topik tugas akhir", "Saya ingin berdiskusi soal keamanan jaringan kampus.");
+        var dimas = (await svc.ListAsync("Dimas")).Single();
+        var input = new MentorRequestInput(dimas.UserId, Kegiatan.Lomba, "Persiapan CTF", "Saya ingin berdiskusi soal materi keamanan jaringan untuk CTF.");
 
         Assert.NotNull(MentorService.Validate(input with { Pesan = "pendek" }));
         Assert.True((await svc.RequestAsync(input)).Ok);
@@ -388,7 +386,7 @@ public class ProfilDanMentorTests
         Assert.False((await svc.DecideAsync(sent.Id, true)).Ok); // bukan mentornya
 
         t.Get<AuthService>().Logout();
-        await t.LoginAs("19810620 200501 1 003");
+        await t.LoginAs("5025231247");
         var incoming = await svc.IncomingAsync();
         Assert.Equal(StatusBimbingan.Pending, incoming[0].Status);
         var mine = incoming.Single(r => r.Id == sent.Id);
@@ -402,7 +400,7 @@ public class ProfilDanMentorTests
     }
 
     [Fact]
-    public async Task Database_versi_lama_ditambah_kolom_dan_data_mentor()
+    public async Task Database_versi_dengan_dosen_dibuat_ulang()
     {
         var path = Path.Combine(Path.GetTempPath(), $"etc-old-{Guid.NewGuid():N}.db");
         try
@@ -412,21 +410,18 @@ public class ProfilDanMentorTests
                 using var db = sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
                 db.Database.EnsureCreated();
                 Seeder.Seed(db);
-                // Tiru database sebelum fitur mentor.
-                db.Database.ExecuteSqlRaw("DROP TABLE MentorRequests");
-                foreach (var c in new[] { "Angkatan", "Pengalaman", "LinkedInUrl", "PortofolioUrl", "FotoPath", "IsMentor" })
-                    db.Database.ExecuteSqlRaw($"ALTER TABLE Users DROP COLUMN {c}");
-                db.Database.ExecuteSqlRaw("ALTER TABLE Rekrutmens DROP COLUMN LinkDetail");
+                // Tiru database versi lama yang masih menyimpan peran dosen.
+                db.Database.ExecuteSqlRaw("ALTER TABLE Users ADD COLUMN Role TEXT NOT NULL DEFAULT 'Dosen'");
             }
             using (var sp = App.BuildServices($"Data Source={path};Pooling=False"))
             {
                 using var db = sp.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext();
                 SchemaUpgrade.Apply(db);
                 Seeder.Seed(db);
-                Assert.True(db.Users.Count(u => u.IsMentor) >= 8);
-                Assert.Equal(2024, db.Users.Single(u => u.NoPengenal == "5025241177").Angkatan);
+                Assert.Equal(0, db.Database.SqlQueryRaw<int>(
+                    "SELECT COUNT(*) AS Value FROM pragma_table_info('Users') WHERE name = 'Role'").AsEnumerable().Single());
+                Assert.Equal(2024, (await db.Users.SingleAsync(u => u.NoPengenal == "5025241177")).Angkatan);
                 Assert.NotEmpty(db.MentorRequests);
-                Assert.True(db.Rekrutmens.Any()); // data lama tetap ada
             }
         }
         finally { try { File.Delete(path); } catch (IOException) { } }

@@ -40,7 +40,6 @@ public class App : Application
 
         using (var db = Services.GetRequiredService<IDbContextFactory<EtcDbContext>>().CreateDbContext())
         {
-            db.Database.EnsureCreated();
             SchemaUpgrade.Apply(db);
             Seeder.Seed(db);
         }

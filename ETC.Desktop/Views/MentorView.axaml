@@ -50,7 +50,7 @@
       <StackPanel Spacing="2">
         <TextBlock Classes="h1" Text="Mentor" />
         <TextBlock Classes="secondary" TextWrapping="Wrap"
-                   Text="Dosen dan mahasiswa senior yang membuka bimbingan untuk lomba, riset, dan projek." />
+                   Text="Kakak tingkat yang membuka bimbingan untuk lomba, riset, dan projek." />
       </StackPanel>
       <Button Grid.Column="1" Classes="primary" Command="{Binding NeedMentorCommand}" VerticalAlignment="Top" Margin="16,4,0,0">
         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -74,13 +74,6 @@
         <c:Glyph Data="{StaticResource Icon.Search}" Size="16" Foreground="{DynamicResource Text.Tertiary}"
                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False" />
       </Panel>
-      <Border Margin="0,0,8,8" Classes="segmented" IsVisible="{Binding IsDaftar}">
-        <StackPanel Orientation="Horizontal">
-          <RadioButton Classes="segment" GroupName="mentorRole" Content="Semua" IsChecked="{Binding FilterAll}" />
-          <RadioButton Classes="segment" GroupName="mentorRole" Content="Dosen" IsChecked="{Binding FilterDosen}" />
-          <RadioButton Classes="segment" GroupName="mentorRole" Content="Mahasiswa" IsChecked="{Binding FilterMahasiswa}" />
-        </StackPanel>
-      </Border>
     </WrapPanel>
 
     <ScrollViewer Grid.Row="2">

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ETC.Desktop.Services;
 
 public record MentorSummary(
-    Guid UserId, string Nama, UserRole Role, string? Jurusan, int? Angkatan, IReadOnlyList<string> Skills,
+    Guid UserId, string Nama, string? Jurusan, int? Angkatan, IReadOnlyList<string> Skills,
     string Pengalaman, string? LinkedInUrl, string? PortofolioUrl, string? FotoPath, string NoTelp,
     double? Rating, int JumlahUlasan, int Dibimbing);
 
@@ -18,16 +18,15 @@ public record MentorRequestItem(
 
 public class MentorService(IDbContextFactory<EtcDbContext> factory, Session session)
 {
-    public async Task<List<MentorSummary>> ListAsync(string? text = null, UserRole? role = null)
+    public async Task<List<MentorSummary>> ListAsync(string? text = null)
     {
         await using var db = await factory.CreateDbContextAsync();
         var me = session.UserId;
         IQueryable<User> q = db.Users.Where(u => u.IsMentor && u.UserId != me);
-        if (role is { } r) q = q.Where(u => u.Role == r);
 
         var mentors = await q.Select(u => new
         {
-            u.UserId, u.Nama, u.Role, u.Jurusan, u.Angkatan, u.Spesialisasi, u.Pengalaman, u.LinkedInUrl,
+            u.UserId, u.Nama, u.Jurusan, u.Angkatan, u.Spesialisasi, u.Pengalaman, u.LinkedInUrl,
             u.PortofolioUrl, u.FotoPath, u.NoTelp,
             Ratings = u.UlasanDiterima.Select(h => h.Rating).ToList(),
         }).ToListAsync();
@@ -41,11 +40,10 @@ public class MentorService(IDbContextFactory<EtcDbContext> factory, Session sess
                         m.Nama.Contains(t, StringComparison.OrdinalIgnoreCase) ||
                         (m.Pengalaman?.Contains(t, StringComparison.OrdinalIgnoreCase) ?? false) ||
                         m.Spesialisasi.Any(s => s.Contains(t, StringComparison.OrdinalIgnoreCase)))
-            .Select(m => new MentorSummary(m.UserId, m.Nama, m.Role, m.Jurusan, m.Angkatan, m.Spesialisasi,
+            .Select(m => new MentorSummary(m.UserId, m.Nama, m.Jurusan, m.Angkatan, m.Spesialisasi,
                 m.Pengalaman ?? "", m.LinkedInUrl, m.PortofolioUrl, m.FotoPath, m.NoTelp,
                 m.Ratings.Count > 0 ? m.Ratings.Average() : null, m.Ratings.Count, dibimbing.GetValueOrDefault(m.UserId)))
-            .OrderBy(m => m.Role == UserRole.Dosen ? 0 : 1)
-            .ThenByDescending(m => m.Dibimbing)
+            .OrderByDescending(m => m.Dibimbing)
             .ThenBy(m => m.Nama)
             .ToList();
     }

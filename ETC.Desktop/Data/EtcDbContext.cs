@@ -31,7 +31,6 @@ public class EtcDbContext(DbContextOptions<EtcDbContext> options) : DbContext(op
         {
             e.HasKey(x => x.UserId);
             e.HasIndex(x => x.NoPengenal).IsUnique();
-            e.Property(x => x.Role).HasConversion<string>();
             e.Property(x => x.Spesialisasi).HasConversion(listConverter, listComparer);
         });
 

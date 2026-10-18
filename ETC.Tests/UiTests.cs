@@ -76,10 +76,10 @@ public class UiTests
 
     static ShellViewModel Shell => (ShellViewModel)App.Services.GetRequiredService<MainViewModel>().Current;
 
-    static async Task<Window> LoginDemo(string which = "Isi akun mahasiswa")
+    static async Task<Window> LoginDemo()
     {
         var w = Open();
-        Click(w, Find<Button>(w, which));
+        Click(w, Find<Button>(w, "Isi akun demo"));
         Click(w, Find<Button>(w, "Masuk"));
         await Until(() => App.Services.GetRequiredService<MainViewModel>().Current is ShellViewModel, "masuk ke shell");
         await Until(() => Has(w, "Perlu keputusan Anda"), "ringkasan tampil");
@@ -91,7 +91,7 @@ public class UiTests
     {
         var w = Open();
         Click(w, Find<Button>(w, "Masuk"));
-        await Until(() => Has(w, "Isi NRP/NIP dan kata sandi."), "pesan validasi kosong");
+        await Until(() => Has(w, "Isi NRP dan kata sandi."), "pesan validasi kosong");
         w.Close();
         await LoginDemo();
     }
@@ -307,11 +307,11 @@ public class UiTests
     [AvaloniaFact]
     public async Task Simpan_profil_memvalidasi_nomor_lalu_keluar()
     {
-        var w = await LoginDemo("Isi akun dosen");
+        var w = await LoginDemo();
         Shell.Navigate(Page.Profil);
         var profile = (ProfileViewModel)Shell.Content!;
         await Until(() => Has(w, "Data diri"), "halaman profil");
-        profile.Bio = "Membimbing riset machine learning.";
+        profile.Bio = "Suka ikut lomba machine learning.";
         profile.NoTelp = "08";
         Click(w, Find<Button>(w, "Simpan profil"));
         await Until(() => Has(w, "Nomor WhatsApp diawali 08 atau 62"), "validasi nomor");

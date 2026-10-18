@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ETC.Desktop.Services;
 
-public record TimMember(Guid UserId, string Nama, string? Jurusan, UserRole Role, int MemberKe,
+public record TimMember(Guid UserId, string Nama, string? Jurusan, int? Angkatan, int MemberKe,
     IReadOnlyList<string> Spesialisasi, string NoTelp, bool IsMe, int? RatingDariSaya);
 
 public record TimSummary(Guid TimId, Guid RekrutmenId, string Judul, string Role, Kegiatan Kegiatan,
@@ -36,7 +36,7 @@ public class TimService(IDbContextFactory<EtcDbContext> factory, Session session
                 t.Rekrutmen.TanggalMulai, t.Rekrutmen.TanggalSelesai,
                 t.Rekrutmen.UserId == me,
                 t.Participants.OrderBy(p => p.MemberKe).Select(p => new TimMember(
-                    p.UserId, p.User.Nama, p.User.Jurusan, p.User.Role, p.MemberKe, p.User.Spesialisasi, p.User.NoTelp,
+                    p.UserId, p.User.Nama, p.User.Jurusan, p.User.Angkatan, p.MemberKe, p.User.Spesialisasi, p.User.NoTelp,
                     p.UserId == me,
                     t.Histories.FirstOrDefault(h => h.UserId == p.UserId && h.ReviewerUserId == me)?.Rating)).ToList()))
             .OrderBy(t => t.Selesai).ThenByDescending(t => t.TanggalMulai)

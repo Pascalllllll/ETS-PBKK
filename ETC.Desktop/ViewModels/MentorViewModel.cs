@@ -13,9 +13,7 @@ public class MentorCard(MentorSummary m)
     public MentorSummary Data { get; } = m;
     public string Nama => Data.Nama;
     public string? FotoPath => Data.FotoPath;
-    public string Subtitle => Data.Role == UserRole.Dosen
-        ? $"Dosen {Data.Jurusan ?? "ITS"}"
-        : $"{Data.Jurusan ?? "Mahasiswa ITS"}{(Data.Angkatan is { } a ? $", angkatan {a}" : "")}";
+    public string Subtitle => $"{Data.Jurusan ?? "Mahasiswa ITS"}{(Data.Angkatan is { } a ? $", angkatan {a}" : "")}";
     public IReadOnlyList<string> Skills => Data.Skills;
     public IReadOnlyList<string> Pengalaman { get; } =
         m.Pengalaman.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Take(4).ToList();
@@ -52,7 +50,6 @@ public partial class MentorViewModel : ViewModelBase
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDaftar), nameof(IsTerkirim), nameof(IsMasuk))] private MentorTab _tab;
     [ObservableProperty] private string _searchText = "";
-    [ObservableProperty] private UserRole? _roleFilter;
     [ObservableProperty] private bool _isLoading = true;
     [ObservableProperty] private string? _error;
 
@@ -64,10 +61,6 @@ public partial class MentorViewModel : ViewModelBase
     public bool IsDaftar { get => Tab == MentorTab.Daftar; set { if (value) Tab = MentorTab.Daftar; } }
     public bool IsTerkirim { get => Tab == MentorTab.Terkirim; set { if (value) Tab = MentorTab.Terkirim; } }
     public bool IsMasuk { get => Tab == MentorTab.Masuk; set { if (value) Tab = MentorTab.Masuk; } }
-
-    public bool FilterAll { get => RoleFilter is null; set { if (value) RoleFilter = null; } }
-    public bool FilterDosen { get => RoleFilter == UserRole.Dosen; set { if (value) RoleFilter = UserRole.Dosen; } }
-    public bool FilterMahasiswa { get => RoleFilter == UserRole.Mahasiswa; set { if (value) RoleFilter = UserRole.Mahasiswa; } }
 
     public bool MentorsEmpty => !IsLoading && Error is null && Mentors.Count == 0;
     public bool TerkirimEmpty => !IsLoading && Terkirim.Count == 0;
@@ -84,12 +77,6 @@ public partial class MentorViewModel : ViewModelBase
         IsMentor = session.CurrentUser?.IsMentor ?? false;
         _tab = tab == MentorTab.Masuk && !IsMentor ? MentorTab.Daftar : tab;
         _ = LoadAsync();
-    }
-
-    partial void OnRoleFilterChanged(UserRole? value)
-    {
-        OnPropertyChanged(nameof(FilterAll)); OnPropertyChanged(nameof(FilterDosen)); OnPropertyChanged(nameof(FilterMahasiswa));
-        _ = LoadMentorsAsync();
     }
 
     async partial void OnSearchTextChanged(string value)
@@ -121,7 +108,7 @@ public partial class MentorViewModel : ViewModelBase
 
     async Task LoadMentorsAsync()
     {
-        var list = await _service.ListAsync(SearchText, RoleFilter);
+        var list = await _service.ListAsync(SearchText);
         Mentors.Clear();
         foreach (var m in list) Mentors.Add(new MentorCard(m));
         NotifyLists();
@@ -145,11 +132,7 @@ public partial class MentorViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    void ClearFilters()
-    {
-        SearchText = "";
-        RoleFilter = null;
-    }
+    void ClearFilters() => SearchText = "";
 
     [RelayCommand]
     void NeedMentor(MentorCard? card)

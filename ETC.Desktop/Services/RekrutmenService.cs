@@ -21,7 +21,7 @@ public record RekrutmenInput(
 
 public record RekrutmenSummary(
     Guid Id, Kegiatan Kegiatan, string Judul, string Role, IReadOnlyList<string> Skills,
-    string PembuatNama, UserRole PembuatRole, Guid PembuatId,
+    string PembuatNama, Guid PembuatId,
     DateTime BatasPendaftaran, DateTime TanggalMulai, DateTime TanggalSelesai,
     decimal? Fee, int Kuota, int Terisi, int JumlahPendaftar, int Menunggu, bool IsOpen, bool IsBookmarked,
     DateTime CreatedAt);
@@ -36,7 +36,7 @@ public class RekrutmenService(IDbContextFactory<EtcDbContext> factory, Session s
     internal static IQueryable<RekrutmenSummary> Project(IQueryable<Rekrutmen> q, Guid viewer) =>
         q.Select(r => new RekrutmenSummary(
             r.RekrutmenId, r.Kegiatan, r.Judul, r.Role, r.Skills,
-            r.User.Nama, r.User.Role, r.UserId,
+            r.User.Nama, r.UserId,
             r.BatasPendaftaran, r.TanggalMulai, r.TanggalSelesai,
             r.Fee, r.Kuota,
             r.Pendaftar.Count(p => p.Status == StatusPendaftar.Accepted),

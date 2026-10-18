@@ -12,7 +12,7 @@ public partial class MemberRow(TimMember m, TimSummary tim) : ObservableObject
     public string Nama => Data.IsMe ? $"{Data.Nama} (Anda)" : Data.Nama;
     public string Initials => Format.Initials(Data.Nama);
     public string Peran => Data.MemberKe == 1 ? "Ketua" : $"Anggota ke-{Data.MemberKe}";
-    public string Meta => $"{Labels.Of(Data.Role)} · {Data.Jurusan ?? "Jurusan belum diisi"}";
+    public string Meta => $"{Data.Jurusan ?? "Jurusan belum diisi"}{(Data.Angkatan is { } a ? $" · angkatan {a}" : "")}";
     public IReadOnlyList<string> Skills => Data.Spesialisasi;
     public bool CanRate => !Data.IsMe && Data.RatingDariSaya is null && Tim.Selesai;
     public bool Rated => Data.RatingDariSaya is not null;

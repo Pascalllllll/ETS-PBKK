@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ETC.Desktop.Services;
 
 public record RegisterRequest(
-    string Nama, UserRole Role, string NoPengenal, string? Jurusan, string NoTelp,
+    string Nama, string NoPengenal, string? Jurusan, string NoTelp,
     IReadOnlyList<string> Spesialisasi, string Password, string ConfirmPassword);
 
 public record ProfileUpdate(
@@ -18,13 +18,13 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
     public async Task<Result> LoginAsync(string noPengenal, string password)
     {
         if (string.IsNullOrWhiteSpace(noPengenal) || string.IsNullOrEmpty(password))
-            return Result.Fail("Isi NRP/NIP dan kata sandi.");
+            return Result.Fail("Isi NRP dan kata sandi.");
 
         await using var db = await factory.CreateDbContextAsync();
-        var no = NormalizeNoPengenal(noPengenal);
+        var no = noPengenal.Trim();
         var user = await db.Users.FirstOrDefaultAsync(u => u.NoPengenal == no);
         if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            return Result.Fail("NRP/NIP atau kata sandi tidak cocok.");
+            return Result.Fail("NRP atau kata sandi tidak cocok.");
 
         session.SignIn(user);
         return Result.Success();
@@ -34,27 +34,12 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
     public static string? ValidateNama(string nama) =>
         string.IsNullOrWhiteSpace(nama) || nama.Trim().Length < 3 ? "Nama minimal 3 karakter." : null;
 
-    public static string? ValidateIdentity(string nama, UserRole role, string noPengenal)
+    public static string? ValidateIdentity(string nama, string nrp)
     {
         if (ValidateNama(nama) is { } err) return err;
-        var digits = Digits(noPengenal);
-        var onlyDigitsAndSpaces = noPengenal.Trim().All(c => char.IsDigit(c) || c == ' ');
-        return role switch
-        {
-            UserRole.Mahasiswa when !onlyDigitsAndSpaces || digits.Length != 10 => "NRP terdiri dari 10 digit, contoh format 5025241XXX.",
-            UserRole.Dosen when !onlyDigitsAndSpaces || digits.Length != 18 => "NIP terdiri dari 18 digit, contoh format 19810620 200501 1 003.",
-            _ => null,
-        };
+        var no = nrp.Trim();
+        return no.Length != 10 || !no.All(char.IsDigit) ? "NRP terdiri dari 10 digit, contoh format 5025241XXX." : null;
     }
-
-    // NIP disimpan dengan pengelompokan baku (8 6 1 3), jadi bisa diketik dengan atau tanpa spasi.
-    public static string NormalizeNoPengenal(string noPengenal)
-    {
-        var d = Digits(noPengenal);
-        return d.Length == 18 ? $"{d[..8]} {d[8..14]} {d[14]} {d[15..]}" : noPengenal.Trim();
-    }
-
-    static string Digits(string s) => new(s.Where(char.IsDigit).ToArray());
 
     public static string? ValidateContact(string noTelp)
     {
@@ -71,24 +56,23 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
 
     public async Task<Result> RegisterAsync(RegisterRequest r)
     {
-        var err = ValidateIdentity(r.Nama, r.Role, r.NoPengenal) ?? ValidateContact(r.NoTelp)
+        var err = ValidateIdentity(r.Nama, r.NoPengenal) ?? ValidateContact(r.NoTelp)
                   ?? ValidatePassword(r.Password, r.ConfirmPassword);
         if (err is not null) return Result.Fail(err);
 
         await using var db = await factory.CreateDbContextAsync();
-        var no = NormalizeNoPengenal(r.NoPengenal);
+        var no = r.NoPengenal.Trim();
         if (await db.Users.AnyAsync(u => u.NoPengenal == no))
-            return Result.Fail("NRP/NIP ini sudah terdaftar. Masuk dengan akun tersebut.");
+            return Result.Fail("NRP ini sudah terdaftar. Masuk dengan akun tersebut.");
 
         var user = new User
         {
             Nama = r.Nama.Trim(),
-            Role = r.Role,
             NoPengenal = no,
             Jurusan = string.IsNullOrWhiteSpace(r.Jurusan) ? null : r.Jurusan,
             NoTelp = r.NoTelp.Trim(),
             Spesialisasi = r.Spesialisasi.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
-            Angkatan = r.Role == UserRole.Mahasiswa ? Seeder.AngkatanDariNrp(no) : null,
+            Angkatan = Seeder.AngkatanDariNrp(no),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(r.Password, 10),
         };
         db.Users.Add(user);
@@ -123,7 +107,7 @@ public partial class AuthService(IDbContextFactory<EtcDbContext> factory, Sessio
         user.NoTelp = p.NoTelp.Trim();
         user.Bio = string.IsNullOrWhiteSpace(p.Bio) ? null : p.Bio.Trim();
         user.Spesialisasi = p.Spesialisasi.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        user.Angkatan = user.Role == UserRole.Mahasiswa ? p.Angkatan : null;
+        user.Angkatan = p.Angkatan;
         user.Pengalaman = Clean(p.Pengalaman);
         user.LinkedInUrl = Clean(p.LinkedInUrl);
         user.PortofolioUrl = Clean(p.PortofolioUrl);

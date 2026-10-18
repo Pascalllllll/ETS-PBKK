@@ -1,8 +1,6 @@
 namespace ETC.Desktop.Models;
 
 // Skema mengikuti etc-be/internal/models, ditambah kolom khusus versi desktop.
-public enum UserRole { Mahasiswa, Dosen }
-
 public enum Kegiatan { Lomba, Riset, Projek }
 
 public enum StatusPendaftar { Pending, Accepted, Rejected }
@@ -15,7 +13,6 @@ public class User
     public string Nama { get; set; } = "";
     public string? Jurusan { get; set; }
     public string NoPengenal { get; set; } = "";
-    public UserRole Role { get; set; }
     public string NoTelp { get; set; } = "";
     public string PasswordHash { get; set; } = "";
     public string? Bio { get; set; }

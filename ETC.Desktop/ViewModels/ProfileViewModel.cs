@@ -44,11 +44,10 @@ public partial class ProfileViewModel : ViewModelBase
         new(Services.Appearance.Dark, "Gelap"),
     ];
 
-    public bool IsMahasiswa => _user.Role == UserRole.Mahasiswa;
     public bool HasFoto => FotoPath is not null;
     public string PengalamanCount => $"{Pengalaman?.Length ?? 0}/1000";
     public int MaxAngkatan => DateTime.Today.Year;
-    public string Identitas => $"{Labels.Of(_user.Role)} · {_user.NoPengenal}";
+    public string Identitas => $"NRP {_user.NoPengenal}";
     public string Bergabung => $"Bergabung {Format.Date(_user.CreatedAt)}";
     public string RatingText => Rating is { } r ? r.ToString("0.0") : "–";
     public string RatingCaption => Reviews.Count == 0 ? "Belum ada ulasan. Ulasan muncul setelah kegiatan tim selesai." : $"Rata-rata dari {Reviews.Count} ulasan rekan tim";

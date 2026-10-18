@@ -7,66 +7,12 @@ public static class Seeder
 {
     public const string DemoPassword = "etc12345";
 
-    record SeedDosen(string Nama, string? Rumpun, string? Nip);
-
     record SeedMahasiswa(string Nama, string Jurusan, string Nrp, string[] Spesialisasi);
 
-    record SeedRek(string Creator, Kegiatan Kegiatan, string Judul, string Role, string Kriteria,
+    record SeedRek(string? Nrp, Kegiatan Kegiatan, string Judul, string Role, string Kriteria,
         string[] Skills, decimal? Fee, int Kuota, int DurasiHari);
 
     const string DemoNrp = "5025241177";
-
-    static readonly Dictionary<string, string> Rumpun = new()
-    {
-        ["RPL"] = "Rekayasa Perangkat Lunak",
-        ["KBJ"] = "Komputasi Berbasis Jaringan",
-        ["KCV"] = "Intelligent Vision Computing",
-        ["AJK"] = "Architecture & Computer Networking",
-        ["IGS"] = "Interaction of Graphics & Art",
-        ["AP"] = "Programming Algorithm",
-        ["MI"] = "Information Management",
-        ["DTK"] = "Basic Applied Computing",
-    };
-
-    // Dosen tanpa NIP diberi ID DEMO yang jelas bukan NIP asli.
-    static readonly SeedDosen[] Dosen =
-    {
-        new("Dr. Ir. Siti Rochimah, S.T.", "RPL", null),
-        new("Daniel Oranova Siahaan", "RPL", null),
-        new("Sarwosri", "RPL", null),
-        new("Umi Laili Yuhana", "RPL", null),
-        new("Rizky Januar Akbar", "RPL", null),
-        new("Tohari Ahmad", "KBJ", null),
-        new("Waskitho Wibisono", "KBJ", null),
-        new("Hudan Studiawan", "KBJ", null),
-        new("Baskoro Adi P.", "KBJ", null),
-        new("Prof. Ir. Ary Mazharuddin Shiddiqi, S.Kom., M.Comp.Sc., Ph.D., IPM.", "KBJ", "19810620 200501 1 003"),
-        new("Dr.Eng. Nanik Suciati", "KCV", null),
-        new("Dr. Chastine Fatichah", "KCV", null),
-        new("Prof. Ir. Handayani Tjandrasa", "KCV", null),
-        new("Dr. Agus Zainal Arifin", "KCV", null),
-        new("Diana Purwitasari, S.Kom., M.Sc.", "KCV", "19780410 200312 2 001"),
-        new("Dini Adni Navastara", "KCV", null),
-        new("Ir. Muchammad Husni", "AJK", null),
-        new("Henning Titi Ciptaningtyas, S.Kom., M.Kom.", "AJK", "19840708 201012 2 004"),
-        new("Prof. Ir. Supeno Djanali", "AJK", null),
-        new("Dr. Royyana Muslim Ijtihadie", "AJK", null),
-        new("Dr. Radityo Anggoro", "AJK", null),
-        new("Imam Kuswardayan", "IGS", null),
-        new("Dr.Eng. Darlis Herumurti", "IGS", null),
-        new("Wijayanti Nurul Khotimah", "IGS", null),
-        new("Anny Yuniarti", "IGS", null),
-        new("Ridho Rahman Hariadi", "IGS", null),
-        new("Ir. F.X. Arunanto", "AP", null),
-        new("Dr.tech. Ir. Raden Venantius Hari Ginardi", "AP", null),
-        new("Fajar Baskoro, S.Kom., M.T.", "AP", "19740403 199903 1 002"),
-        new("Dwi Sunaryono, S.Kom., M.Kom.", "AP", "19720528 199702 1 001"),
-        new("Rully Sulaiman, S.Kom., M.Kom.", "AP", "19700213 199402 1 001"),
-        new("Prof. Drs. Ec. Ir. Riyanarto Sarno", "MI", null),
-        new("Victor Hariadi", "DTK", null),
-        new("Prof. Dr. Ir. Joko Lianto Buliali", "DTK", null),
-        new("Ir. Suhadi Lili, M.T.I.", null, "19690728 199303 1 001"),
-    };
 
     // Mahasiswa Teknik Informatika angkatan 23 sampai 26 (nama dan NRP asli).
     static readonly SeedMahasiswa[] Mahasiswa =
@@ -157,52 +103,52 @@ public static class Seeder
         new("Rafly Al Fahrezi", "Teknik Informatika", "5025241131", ["PyTorch", "Machine Learning"]),
     };
 
-    // Creator adalah kode rumpun dosen pembuat, atau "demo" untuk akun Hosea.
+    // Nrp adalah pembuat rekrutmen; null berarti dipilih mahasiswa yang keahliannya paling cocok.
     static readonly SeedRek[] Rekrutmens =
     {
-        new("KCV", Kegiatan.Riset, "Klasifikasi Citra Daun Padi", "Asisten Peneliti ML", "IPK min 3.5, Python, Machine Learning", ["Python", "Machine Learning"], 500000, 2, 180),
-        new("RPL", Kegiatan.Projek, "Portal Layanan Akademik Departemen", "Full Stack Developer", "React, Node.js, pengalaman minimal 6 bulan", ["React", "Node.js"], 750000, 2, 200),
-        new("DTK", Kegiatan.Lomba, "Satria Data 2025", "Anggota Tim Lomba Statistik", "Mahasiswa S1 aktif, tim 3 orang, IPK min 3.0", ["Statistika", "R"], null, 2, 90),
-        new("AJK", Kegiatan.Riset, "Monitoring Kualitas Air Tambak", "Peneliti IoT", "Arduino, sensor IoT, basic C/C++", ["Arduino", "IoT", "C++"], 600000, 1, 200),
-        new("KCV", Kegiatan.Projek, "Deteksi Kepadatan Kendaraan", "Computer Vision Engineer", "OpenCV, Python, Computer Vision dasar", ["OpenCV", "Python"], 800000, 2, 210),
-        new("KBJ", Kegiatan.Lomba, "CTF Cyber Jawara", "CTF Team Member", "Keamanan jaringan, pengalaman CTF", ["Networking", "Linux"], null, 3, 75),
-        new("MI", Kegiatan.Riset, "Dashboard Kinerja UMKM", "Analis Data Bisnis", "Power BI atau Tableau, analisis data bisnis", ["Power BI", "Tableau"], 550000, 1, 210),
-        new("AP", Kegiatan.Projek, "Mesin Penjadwalan Kuliah", "Backend Developer", "Algoritma lanjut, C++ atau Java", ["Java", "Algoritma"], 700000, 2, 230),
-        new("DTK", Kegiatan.Lomba, "Kontes Robot Indonesia", "Anggota Tim Robot", "Robotika, Arduino atau ROS, tim 2-4 orang", ["Arduino", "ROS"], null, 3, 90),
-        new("IGS", Kegiatan.Riset, "Simulasi Evakuasi Berbasis Game", "Game Researcher", "Unity atau Unreal Engine, C# atau C++", ["Unity", "C#"], 650000, 1, 200),
-        new("KCV", Kegiatan.Projek, "Chatbot Layanan Kemahasiswaan", "NLP Engineer", "NLP, HuggingFace Transformers, Python", ["Python", "NLP"], 900000, 2, 210),
-        new("demo", Kegiatan.Lomba, "Gemastik XIX: Pengembangan Perangkat Lunak", "UI/UX Designer", "Paham Figma, bisa riset pengguna, siap 3 bulan", ["Figma", "UI/UX"], null, 2, 100),
-        new("RPL", Kegiatan.Lomba, "Hackathon Kota Cerdas", "Anggota Tim Hackathon", "Web hackathon 48 jam, tim 2-3 orang", ["React", "Node.js"], null, 2, 60),
-        new("DTK", Kegiatan.Riset, "Pemodelan Curah Hujan Jawa Timur", "Asisten Riset Statistik", "Statistika inferensial, R atau Python", ["Statistika", "R", "Python"], 520000, 1, 210),
-        new("AJK", Kegiatan.Projek, "Otomasi Lini Produksi Mini", "Automation Engineer", "SCADA, PLC, otomasi industri dasar", ["PLC", "SCADA"], 850000, 2, 220),
-        new("KCV", Kegiatan.Lomba, "Kompetisi AI Nasional", "AI Competitor", "Kompetisi AI/ML nasional, track machine learning", ["Machine Learning", "Python"], null, 3, 90),
-        new("KBJ", Kegiatan.Riset, "Uji Penetrasi Sistem Informasi Kampus", "Security Researcher", "Penetration testing, ethical hacking", ["Linux", "Networking"], 575000, 1, 200),
-        new("MI", Kegiatan.Projek, "Migrasi ERP Koperasi Mahasiswa", "SAP Junior Consultant", "SAP ERP, business process analysis", ["SAP", "Business Process"], 950000, 2, 210),
-        new("AP", Kegiatan.Lomba, "ONMIPA Matematika", "Peserta Olimpiade Matematika", "Olimpiade matematika, kalkulus dan aljabar", ["Matematika Diskrit", "Algoritma"], null, 2, 60),
-        new("DTK", Kegiatan.Riset, "Kendali Lengan Robot Adaptif", "Peneliti Kontrol Sistem", "Kontrol sistem, MATLAB dan Simulink", ["MATLAB", "Simulink"], 610000, 1, 210),
-        new("IGS", Kegiatan.Projek, "Tur Virtual Museum Surabaya", "VR Developer", "Unity VR/AR, C#, pengalaman 3D modeling", ["Unity", "C#"], 1000000, 2, 200),
-        new("KCV", Kegiatan.Lomba, "Data Science Competition Arkavidia", "Data Scientist Kompetisi", "Data science competition, pengalaman Kaggle", ["Python", "Data Science"], null, 2, 90),
-        new("KBJ", Kegiatan.Riset, "Arsitektur Serverless untuk SIAKAD", "Cloud Researcher", "Cloud architecture, AWS atau GCP, DevOps", ["AWS", "DevOps"], 720000, 1, 200),
-        new("demo", Kegiatan.Projek, "Aplikasi Peminjaman Ruang Lab", "Mobile Developer", "Flutter atau React Native, pernah rilis aplikasi", ["Flutter", "React Native"], 400000, 2, 120),
-        new("KCV", Kegiatan.Projek, "Segmentasi Citra Medis Sederhana", "Image Processing Developer", "Image processing, scikit-image, Python", ["Python", "OpenCV"], 680000, 2, 210),
-        new("AJK", Kegiatan.Lomba, "Lomba Desain PCB Nasional", "PCB Designer", "Desain PCB, KiCad atau Altium Designer", ["PCB Design"], null, 1, 75),
-        new("KCV", Kegiatan.Riset, "Deep Learning untuk Deteksi Retak Jalan", "Deep Learning Researcher", "Deep learning, PyTorch, GPU computing", ["PyTorch", "Python"], 850000, 2, 210),
-        new("AJK", Kegiatan.Projek, "Pipeline CI/CD Lab Jaringan", "DevSecOps Engineer", "DevSecOps, Docker, Kubernetes, CI/CD pipeline", ["Docker", "Kubernetes"], 900000, 2, 200),
-        new("MI", Kegiatan.Lomba, "Business Case Competition", "Business Analyst Kompetisi", "Business case competition, analisis pasar", ["Business Process", "Power BI"], null, 3, 90),
-        new("KBJ", Kegiatan.Riset, "Implementasi Kriptografi Ringan", "Cryptography Researcher", "Kriptografi modern, implementasi algoritma", ["Kriptografi", "C++"], 630000, 1, 200),
-        new("DTK", Kegiatan.Projek, "Robot Pengantar Dokumen Gedung", "Robotics Developer", "Robot otonom, ROS 2, Python", ["ROS", "Python"], 950000, 2, 210),
-        new("IGS", Kegiatan.Lomba, "Game Jam 72 Jam", "Game Developer Kompetisi", "Game jam 72 jam, Unity atau Godot, tim 2-3", ["Unity", "C#"], null, 2, 45),
-        new("KCV", Kegiatan.Riset, "Reinforcement Learning Lampu Lalu Lintas", "RL Researcher", "Reinforcement learning, OpenAI Gym, PyTorch", ["PyTorch", "Machine Learning"], 780000, 1, 210),
-        new("RPL", Kegiatan.Projek, "Layanan Notifikasi Kampus", "Backend Microservices Engineer", "Microservices, Go, gRPC, Apache Kafka", ["Go", "Microservices"], 1100000, 2, 200),
-        new("DTK", Kegiatan.Lomba, "Olimpiade Statistika Nasional", "Statistics Competitor", "Olimpiade statistika, inferensi dan regresi", ["Statistika", "R"], null, 2, 90),
-        new("AJK", Kegiatan.Riset, "Sensor Network Smart Grid", "Smart Grid Researcher", "Smart grid, IoT sensor network, MQTT", ["IoT", "Raspberry Pi"], 700000, 1, 200),
-        new("demo", Kegiatan.Lomba, "Hology 8.0 Web Development", "Frontend Developer", "React atau Vue, paham Git, aktif berdiskusi", ["React", "TypeScript"], null, 2, 70),
-        new("RPL", Kegiatan.Projek, "MLOps untuk Model Presensi Wajah", "MLOps Engineer", "MLOps, model deployment, FastAPI, monitoring", ["Python", "Docker"], 1050000, 2, 210),
-        new("KBJ", Kegiatan.Lomba, "CTF Nasional Kategori Web & Pwn", "CTF Team Captain", "CTF nasional, tim 4 orang, kategori web & pwn", ["Linux", "Shell Scripting"], null, 3, 75),
-        new("MI", Kegiatan.Riset, "Transformasi Digital Proses Bisnis", "Digital Transform Researcher", "Digital transformation, analisis ERP & BPM", ["SAP", "Business Process"], 660000, 1, 210),
-        new("AP", Kegiatan.Projek, "Compiler Bahasa Edukasi", "Compiler Engineer", "Compiler design, LLVM IR, bahasa pemrograman", ["C++", "Algoritma"], 800000, 2, 200),
-        new("DTK", Kegiatan.Lomba, "KRTI Drone Competition", "Drone Pilot Researcher", "KRTI drone competition, autonomous flight mode", ["ROS", "Python"], null, 3, 90),
-        new("IGS", Kegiatan.Riset, "Spatial Computing untuk Pembelajaran", "Spatial Computing Researcher", "Spatial computing, WebXR, AR/MR development", ["Unity", "TypeScript"], 875000, 1, 210),
+        new(null, Kegiatan.Riset, "Klasifikasi Citra Daun Padi", "Asisten Peneliti ML", "IPK min 3.5, Python, Machine Learning", ["Python", "Machine Learning"], 500000, 2, 180),
+        new(null, Kegiatan.Projek, "Portal Layanan Akademik Departemen", "Full Stack Developer", "React, Node.js, pengalaman minimal 6 bulan", ["React", "Node.js"], 750000, 2, 200),
+        new(null, Kegiatan.Lomba, "Satria Data 2025", "Anggota Tim Lomba Statistik", "Mahasiswa S1 aktif, tim 3 orang, IPK min 3.0", ["Statistika", "R"], null, 2, 90),
+        new(null, Kegiatan.Riset, "Monitoring Kualitas Air Tambak", "Peneliti IoT", "Arduino, sensor IoT, basic C/C++", ["Arduino", "IoT", "C++"], 600000, 1, 200),
+        new(null, Kegiatan.Projek, "Deteksi Kepadatan Kendaraan", "Computer Vision Engineer", "OpenCV, Python, Computer Vision dasar", ["OpenCV", "Python"], 800000, 2, 210),
+        new(null, Kegiatan.Lomba, "CTF Cyber Jawara", "CTF Team Member", "Keamanan jaringan, pengalaman CTF", ["Networking", "Linux"], null, 3, 75),
+        new(null, Kegiatan.Riset, "Dashboard Kinerja UMKM", "Analis Data Bisnis", "Power BI atau Tableau, analisis data bisnis", ["Power BI", "Tableau"], 550000, 1, 210),
+        new(null, Kegiatan.Projek, "Mesin Penjadwalan Kuliah", "Backend Developer", "Algoritma lanjut, C++ atau Java", ["Java", "Algoritma"], 700000, 2, 230),
+        new(null, Kegiatan.Lomba, "Kontes Robot Indonesia", "Anggota Tim Robot", "Robotika, Arduino atau ROS, tim 2-4 orang", ["Arduino", "ROS"], null, 3, 90),
+        new(null, Kegiatan.Riset, "Simulasi Evakuasi Berbasis Game", "Game Researcher", "Unity atau Unreal Engine, C# atau C++", ["Unity", "C#"], 650000, 1, 200),
+        new(null, Kegiatan.Projek, "Chatbot Layanan Kemahasiswaan", "NLP Engineer", "NLP, HuggingFace Transformers, Python", ["Python", "NLP"], 900000, 2, 210),
+        new(DemoNrp, Kegiatan.Lomba, "Gemastik XIX: Pengembangan Perangkat Lunak", "UI/UX Designer", "Paham Figma, bisa riset pengguna, siap 3 bulan", ["Figma", "UI/UX"], null, 2, 100),
+        new(null, Kegiatan.Lomba, "Hackathon Kota Cerdas", "Anggota Tim Hackathon", "Web hackathon 48 jam, tim 2-3 orang", ["React", "Node.js"], null, 2, 60),
+        new(null, Kegiatan.Riset, "Pemodelan Curah Hujan Jawa Timur", "Asisten Riset Statistik", "Statistika inferensial, R atau Python", ["Statistika", "R", "Python"], 520000, 1, 210),
+        new(null, Kegiatan.Projek, "Otomasi Lini Produksi Mini", "Automation Engineer", "SCADA, PLC, otomasi industri dasar", ["PLC", "SCADA"], 850000, 2, 220),
+        new(null, Kegiatan.Lomba, "Kompetisi AI Nasional", "AI Competitor", "Kompetisi AI/ML nasional, track machine learning", ["Machine Learning", "Python"], null, 3, 90),
+        new(null, Kegiatan.Riset, "Uji Penetrasi Sistem Informasi Kampus", "Security Researcher", "Penetration testing, ethical hacking", ["Linux", "Networking"], 575000, 1, 200),
+        new(null, Kegiatan.Projek, "Migrasi ERP Koperasi Mahasiswa", "SAP Junior Consultant", "SAP ERP, business process analysis", ["SAP", "Business Process"], 950000, 2, 210),
+        new(null, Kegiatan.Lomba, "ONMIPA Matematika", "Peserta Olimpiade Matematika", "Olimpiade matematika, kalkulus dan aljabar", ["Matematika Diskrit", "Algoritma"], null, 2, 60),
+        new(null, Kegiatan.Riset, "Kendali Lengan Robot Adaptif", "Peneliti Kontrol Sistem", "Kontrol sistem, MATLAB dan Simulink", ["MATLAB", "Simulink"], 610000, 1, 210),
+        new(null, Kegiatan.Projek, "Tur Virtual Museum Surabaya", "VR Developer", "Unity VR/AR, C#, pengalaman 3D modeling", ["Unity", "C#"], 1000000, 2, 200),
+        new(null, Kegiatan.Lomba, "Data Science Competition Arkavidia", "Data Scientist Kompetisi", "Data science competition, pengalaman Kaggle", ["Python", "Data Science"], null, 2, 90),
+        new(null, Kegiatan.Riset, "Arsitektur Serverless untuk SIAKAD", "Cloud Researcher", "Cloud architecture, AWS atau GCP, DevOps", ["AWS", "DevOps"], 720000, 1, 200),
+        new(DemoNrp, Kegiatan.Projek, "Aplikasi Peminjaman Ruang Lab", "Mobile Developer", "Flutter atau React Native, pernah rilis aplikasi", ["Flutter", "React Native"], 400000, 2, 120),
+        new(null, Kegiatan.Projek, "Segmentasi Citra Medis Sederhana", "Image Processing Developer", "Image processing, scikit-image, Python", ["Python", "OpenCV"], 680000, 2, 210),
+        new(null, Kegiatan.Lomba, "Lomba Desain PCB Nasional", "PCB Designer", "Desain PCB, KiCad atau Altium Designer", ["PCB Design"], null, 1, 75),
+        new(null, Kegiatan.Riset, "Deep Learning untuk Deteksi Retak Jalan", "Deep Learning Researcher", "Deep learning, PyTorch, GPU computing", ["PyTorch", "Python"], 850000, 2, 210),
+        new(null, Kegiatan.Projek, "Pipeline CI/CD Lab Jaringan", "DevSecOps Engineer", "DevSecOps, Docker, Kubernetes, CI/CD pipeline", ["Docker", "Kubernetes"], 900000, 2, 200),
+        new(null, Kegiatan.Lomba, "Business Case Competition", "Business Analyst Kompetisi", "Business case competition, analisis pasar", ["Business Process", "Power BI"], null, 3, 90),
+        new(null, Kegiatan.Riset, "Implementasi Kriptografi Ringan", "Cryptography Researcher", "Kriptografi modern, implementasi algoritma", ["Kriptografi", "C++"], 630000, 1, 200),
+        new(null, Kegiatan.Projek, "Robot Pengantar Dokumen Gedung", "Robotics Developer", "Robot otonom, ROS 2, Python", ["ROS", "Python"], 950000, 2, 210),
+        new(null, Kegiatan.Lomba, "Game Jam 72 Jam", "Game Developer Kompetisi", "Game jam 72 jam, Unity atau Godot, tim 2-3", ["Unity", "C#"], null, 2, 45),
+        new(null, Kegiatan.Riset, "Reinforcement Learning Lampu Lalu Lintas", "RL Researcher", "Reinforcement learning, OpenAI Gym, PyTorch", ["PyTorch", "Machine Learning"], 780000, 1, 210),
+        new(null, Kegiatan.Projek, "Layanan Notifikasi Kampus", "Backend Microservices Engineer", "Microservices, Go, gRPC, Apache Kafka", ["Go", "Microservices"], 1100000, 2, 200),
+        new(null, Kegiatan.Lomba, "Olimpiade Statistika Nasional", "Statistics Competitor", "Olimpiade statistika, inferensi dan regresi", ["Statistika", "R"], null, 2, 90),
+        new(null, Kegiatan.Riset, "Sensor Network Smart Grid", "Smart Grid Researcher", "Smart grid, IoT sensor network, MQTT", ["IoT", "Raspberry Pi"], 700000, 1, 200),
+        new(DemoNrp, Kegiatan.Lomba, "Hology 8.0 Web Development", "Frontend Developer", "React atau Vue, paham Git, aktif berdiskusi", ["React", "TypeScript"], null, 2, 70),
+        new(null, Kegiatan.Projek, "MLOps untuk Model Presensi Wajah", "MLOps Engineer", "MLOps, model deployment, FastAPI, monitoring", ["Python", "Docker"], 1050000, 2, 210),
+        new(null, Kegiatan.Lomba, "CTF Nasional Kategori Web & Pwn", "CTF Team Captain", "CTF nasional, tim 4 orang, kategori web & pwn", ["Linux", "Shell Scripting"], null, 3, 75),
+        new(null, Kegiatan.Riset, "Transformasi Digital Proses Bisnis", "Digital Transform Researcher", "Digital transformation, analisis ERP & BPM", ["SAP", "Business Process"], 660000, 1, 210),
+        new(null, Kegiatan.Projek, "Compiler Bahasa Edukasi", "Compiler Engineer", "Compiler design, LLVM IR, bahasa pemrograman", ["C++", "Algoritma"], 800000, 2, 200),
+        new(null, Kegiatan.Lomba, "KRTI Drone Competition", "Drone Pilot Researcher", "KRTI drone competition, autonomous flight mode", ["ROS", "Python"], null, 3, 90),
+        new(null, Kegiatan.Riset, "Spatial Computing untuk Pembelajaran", "Spatial Computing Researcher", "Spatial computing, WebXR, AR/MR development", ["Unity", "TypeScript"], 875000, 1, 210),
     };
 
     static readonly string[] Alasan =
@@ -211,7 +157,7 @@ public static class Seeder
         "Tertarik membangun produk berskala besar bersama tim",
         "Ingin mengasah skill lomba bersama mentor berpengalaman",
         "Pengalaman saya cocok dengan topik ini",
-        "Ingin berkontribusi dan belajar dari dosen ahlinya",
+        "Ingin belajar dari kakak tingkat yang sudah berpengalaman",
         "Pengalaman analisis data cocok untuk kegiatan ini",
         "Antusias di bidang ini sejak awal kuliah",
         "Siap berkomitmen penuh sampai kegiatan selesai",
@@ -228,20 +174,7 @@ public static class Seeder
         "Ide-idenya membuat solusi tim lebih matang.",
     };
 
-    // Bidang rumpun, dipakai sebagai keahlian dosen yang menjadi mentor.
-    static readonly Dictionary<string, string[]> BidangRumpun = new()
-    {
-        ["RPL"] = ["Software Engineering", "Requirement Analysis", "Software Testing"],
-        ["KBJ"] = ["Networking", "Keamanan Siber", "Cloud Computing"],
-        ["KCV"] = ["Computer Vision", "Machine Learning", "Python"],
-        ["AJK"] = ["IoT", "Jaringan Komputer", "Arduino"],
-        ["IGS"] = ["Game Development", "Unity", "UI/UX"],
-        ["AP"] = ["Algoritma", "C++", "Competitive Programming"],
-        ["MI"] = ["Data Mining", "Business Process", "SQL"],
-        ["DTK"] = ["Statistika", "MATLAB", "Matematika"],
-    };
-
-    // Mentor mahasiswa diambil dari angkatan 23; prestasinya karangan untuk demo.
+    // Mentor diambil dari mahasiswa angkatan 23; prestasinya karangan untuk demo.
     record SeedMentorMhs(string Nrp, string[] Skills, string Pengalaman);
 
     static readonly SeedMentorMhs[] MentorMahasiswa =
@@ -254,44 +187,34 @@ public static class Seeder
             "Juara 1 game jam regional 2025\nMerilis dua game indie di itch.io"),
         new("5025231247", ["Linux", "Shell Scripting", "Networking"],
             "Top 10 CTF tingkat mahasiswa 2025\nAsisten Laboratorium Arsitektur dan Jaringan Komputer"),
+        new("5025231288", ["Python", "Machine Learning", "Computer Vision"],
+            "Juara 3 Kompetisi AI Nasional 2025\nAsisten praktikum Kecerdasan Buatan"),
+        new("5025231127", ["C++", "Algoritma", "Competitive Programming"],
+            "Finalis ICPC Asia Jakarta Regional 2025\nPengajar kelas persiapan olimpiade pemrograman di himpunan mahasiswa"),
+        new("5025231272", ["Figma", "UI/UX", "User Research"],
+            "Juara 1 lomba UI/UX tingkat nasional 2025\nUI/UX designer intern di perusahaan fintech selama 4 bulan"),
+        new("5025231286", ["Go", "Microservices", "Cloud Computing"],
+            "Finalis Hackathon Kota Cerdas 2025\nBackend engineer intern di startup logistik"),
     };
 
     public static void Seed(EtcDbContext db, DateTime? now = null)
     {
-        if (db.Users.Any())
-        {
-            // Database dari versi sebelumnya: tambahkan data mentor tanpa mengulang seluruh seed.
-            if (!db.Users.Any(u => u.IsMentor) && db.Users.Any(u => u.NoPengenal == DemoNrp))
-            {
-                SeedMentors(db, db.Users.ToList(), (now ?? DateTime.Now).Date);
-                db.SaveChanges();
-            }
-            return;
-        }
+        if (db.Users.Any()) return;
 
         var today = (now ?? DateTime.Now).Date;
         var rng = new Random(20261015);
         var hash = BCrypt.Net.BCrypt.HashPassword(DemoPassword, 10);
 
-        var dosen = Dosen.Select((d, i) => new User
-        {
-            Nama = d.Nama,
-            Jurusan = "Teknik Informatika",
-            NoPengenal = d.Nip ?? $"DEMO-{d.Rumpun ?? "IF"}-{i + 1:00}",
-            Role = UserRole.Dosen,
-            Bio = d.Rumpun is null ? null : $"Rumpun {d.Rumpun} ({Rumpun[d.Rumpun]})",
-        }).ToList();
         var mahasiswa = Mahasiswa.Select(m => new User
         {
             Nama = m.Nama,
             Jurusan = m.Jurusan,
             NoPengenal = m.Nrp,
-            Role = UserRole.Mahasiswa,
+            Angkatan = AngkatanDariNrp(m.Nrp),
             Spesialisasi = m.Spesialisasi.ToList(),
         }).ToList();
-        dosen.Single(d => d.Nama.Contains("Ary Mazharuddin")).Bio = "Kepala Departemen Teknik Informatika, Rumpun KBJ";
 
-        var users = dosen.Concat(mahasiswa).ToList();
+        var users = mahasiswa;
         for (int i = 0; i < users.Count; i++)
         {
             users[i].NoTelp = $"08123456{i:0000}";
@@ -301,21 +224,25 @@ public static class Seeder
         db.Users.AddRange(users);
 
         var demo = mahasiswa.Single(m => m.NoPengenal == DemoNrp);
-        var nextByRumpun = new Dictionary<string, int>();
-        User PickCreator(string code)
+        // Di antara mahasiswa dengan keahlian paling cocok, yang paling sedikit membuat rekrutmen dipilih lebih dulu.
+        var dibuat = new Dictionary<User, int>();
+        User PickCreator(SeedRek s)
         {
-            if (code == "demo") return demo;
-            var pool = dosen.Where((_, i) => Dosen[i].Rumpun == code).ToList();
-            var k = nextByRumpun.GetValueOrDefault(code);
-            nextByRumpun[code] = k + 1;
-            return pool[k % pool.Count];
+            var creator = s.Nrp is { } nrp
+                ? mahasiswa.Single(m => m.NoPengenal == nrp)
+                : mahasiswa.Where(m => m != demo)
+                    .OrderByDescending(m => m.Spesialisasi.Count(s.Skills.Contains))
+                    .ThenBy(m => dibuat.GetValueOrDefault(m))
+                    .First();
+            dibuat[creator] = dibuat.GetValueOrDefault(creator) + 1;
+            return creator;
         }
         int n = Rekrutmens.Length;
 
         for (int i = 0; i < n; i++)
         {
             var s = Rekrutmens[i];
-            var creator = PickCreator(s.Creator);
+            var creator = PickCreator(s);
             var created = today.AddDays(-(n - 1 - i) * 8.6 - 3).AddHours(9 + i % 7);
             // Jendela 60 sampai 95 hari: sekitar sepuluh rekrutmen terbaru masih dibuka.
             var batas = created.Date.AddDays(60 + i * 7 % 36);
@@ -393,7 +320,8 @@ public static class Seeder
                 foreach (var m in tim.Participants.Skip(1))
                 {
                     db.Histories.Add(NewReview(rng, m.UserId, ketua.UserId, tim, rek.TanggalSelesai));
-                    if (rng.Next(3) > 0)
+                    // Akun demo menyisakan anggota terakhir tanpa ulasan, supaya alur memberi ulasan bisa dicoba.
+                    if (rng.Next(3) > 0 && !(ketua.UserId == demo.UserId && m == tim.Participants[^1]))
                         db.Histories.Add(NewReview(rng, ketua.UserId, m.UserId, tim, rek.TanggalSelesai));
                 }
             }
@@ -412,24 +340,9 @@ public static class Seeder
 
     static void SeedMentors(EtcDbContext db, List<User> users, DateTime today)
     {
-        foreach (var m in users.Where(u => u.Role == UserRole.Mahasiswa))
-            m.Angkatan ??= AngkatanDariNrp(m.NoPengenal);
-
-        // Satu dosen per rumpun; dosen dengan NIP asli didahulukan supaya akun demo dosen ikut menjadi mentor.
-        foreach (var (code, bidang) in BidangRumpun)
-        {
-            var mentor = users.Where(u => u.Role == UserRole.Dosen && u.NoPengenal.StartsWith($"DEMO-{code}-") || IsDosenRumpun(u, code))
-                .OrderBy(u => u.NoPengenal.StartsWith("DEMO-")).FirstOrDefault();
-            if (mentor is null) continue;
-            mentor.IsMentor = true;
-            mentor.Spesialisasi = bidang.ToList();
-            mentor.Pengalaman = $"Dosen Departemen Teknik Informatika ITS\nRumpun {code} ({Rumpun[code]})";
-        }
-
         foreach (var s in MentorMahasiswa)
         {
-            var m = users.FirstOrDefault(u => u.NoPengenal == s.Nrp);
-            if (m is null) continue;
+            var m = users.Single(u => u.NoPengenal == s.Nrp);
             m.IsMentor = true;
             m.Spesialisasi = s.Skills.ToList();
             m.Pengalaman = s.Pengalaman;
@@ -439,13 +352,13 @@ public static class Seeder
 
         var demo = users.Single(u => u.NoPengenal == DemoNrp);
         var mentors = users.Where(u => u.IsMentor).ToList();
-        User M(string nameOrNrp) => mentors.First(u => u.NoPengenal == nameOrNrp || u.Nama.Contains(nameOrNrp));
-        var mahasiswaLain = users.Where(u => u.Role == UserRole.Mahasiswa && !u.IsMentor && u != demo).ToList();
+        User M(string nrp) => mentors.First(u => u.NoPengenal == nrp);
+        var mahasiswaLain = users.Where(u => !u.IsMentor && u != demo).ToList();
 
         db.MentorRequests.AddRange(
             new MentorRequest
             {
-                MentorId = M("Diana Purwitasari").UserId, UserId = demo.UserId, Kegiatan = Kegiatan.Lomba,
+                MentorId = M("5025231288").UserId, UserId = demo.UserId, Kegiatan = Kegiatan.Lomba,
                 Topik = "Persiapan Kompetisi AI Nasional",
                 Pesan = "Tim kami butuh arahan memilih arsitektur model dan strategi validasi sebelum babak penyisihan.",
                 Status = StatusBimbingan.Accepted, CreatedAt = today.AddDays(-20).AddHours(10), DecidedAt = today.AddDays(-18).AddHours(9),
@@ -459,22 +372,19 @@ public static class Seeder
             },
             new MentorRequest
             {
-                MentorId = M("Ary Mazharuddin").UserId, UserId = mahasiswaLain[0].UserId, Kegiatan = Kegiatan.Lomba,
+                MentorId = M("5025231247").UserId, UserId = mahasiswaLain[0].UserId, Kegiatan = Kegiatan.Lomba,
                 Topik = "Strategi CTF kategori jaringan",
                 Pesan = "Kami baru pertama kali ikut CTF dan ingin tahu materi jaringan apa yang perlu dipelajari dulu.",
                 CreatedAt = today.AddDays(-1).AddHours(16),
             },
             new MentorRequest
             {
-                MentorId = M("Ary Mazharuddin").UserId, UserId = mahasiswaLain[3].UserId, Kegiatan = Kegiatan.Riset,
-                Topik = "Topik tugas akhir keamanan IoT",
+                MentorId = M("5025231247").UserId, UserId = mahasiswaLain[3].UserId, Kegiatan = Kegiatan.Riset,
+                Topik = "Ide PKM keamanan perangkat IoT",
                 Pesan = "Saya tertarik dengan keamanan perangkat IoT dan ingin berdiskusi soal ruang lingkup yang realistis.",
                 CreatedAt = today.AddDays(-4).AddHours(11),
             });
     }
-
-    static bool IsDosenRumpun(User u, string code) =>
-        u.Role == UserRole.Dosen && Dosen.Any(d => d.Rumpun == code && d.Nip == u.NoPengenal);
 
     static History NewReview(Random rng, Guid target, Guid reviewer, Tim tim, DateTime selesai) => new()
     {

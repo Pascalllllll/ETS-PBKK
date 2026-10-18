@@ -119,7 +119,7 @@
               <c:Avatar Nama="{Binding Nama}" FotoPath="{Binding FotoPath}" Size="30" />
               <StackPanel Grid.Column="1" Margin="9,0" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Nama}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
-                <TextBlock Classes="caption" Text="{Binding RoleText}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                <TextBlock Classes="caption" Text="{Binding NrpText}" FontSize="11" TextTrimming="CharacterEllipsis" />
               </StackPanel>
               <Button Grid.Column="2" Classes="icon" Command="{Binding LogoutCommand}" ToolTip.Tip="Keluar"
                       AutomationProperties.Name="Keluar">

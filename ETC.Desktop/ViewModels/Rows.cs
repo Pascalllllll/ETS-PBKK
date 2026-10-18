@@ -11,7 +11,7 @@ public partial class RekrutmenRow(RekrutmenSummary s) : ObservableObject
     public string Role => Summary.Role;
     public string KegiatanLabel => Labels.Of(Summary.Kegiatan);
     public string KegiatanIcon => Format.KegiatanIcon(Summary.Kegiatan);
-    public string Pembuat => $"{Summary.PembuatNama} · {Labels.Of(Summary.PembuatRole)}";
+    public string Pembuat => Summary.PembuatNama;
     public string PembuatNama => Summary.PembuatNama;
     public IReadOnlyList<string> Skills => Summary.Skills;
     public string DeadlineText => IsOpen ? Format.Deadline(Summary.BatasPendaftaran) : "Pendaftaran ditutup";

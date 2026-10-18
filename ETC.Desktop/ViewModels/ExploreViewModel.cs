@@ -43,7 +43,7 @@ public partial class ExploreViewModel : ViewModelBase
     public string Title => _bookmarks ? "Tersimpan" : "Jelajahi rekrutmen";
     public string Subtitle => _bookmarks
         ? "Rekrutmen yang Anda simpan, diurutkan dari tenggat terdekat."
-        : "Lomba, riset, dan projek dari mahasiswa dan dosen.";
+        : "Lomba, riset, dan projek dari sesama mahasiswa.";
     public bool IsEmpty => !IsLoading && Error is null && Items.Count == 0;
     public string EmptyTitle => _bookmarks ? "Belum ada yang disimpan" : "Tidak ada rekrutmen yang cocok";
     public string EmptyBody => _bookmarks
